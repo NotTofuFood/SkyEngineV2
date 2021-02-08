@@ -5,15 +5,18 @@ import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 
-import renderer.Display;
+import rays.Portal;
 
 public class Wall {
 	
 	private double x1, y1, x2, y2;
 	private BufferedImage texture;
-	private BufferedImage[] texture_splices;
+
+	public boolean isPortal = false;
 	
-	private int textureID;
+	public Portal portal_id;
+	
+	public int textureID = 1;
 	
     public Wall(double x1, double y1, double x2, double y2) {
 		super();
@@ -28,6 +31,18 @@ public class Wall {
     	g.draw(new Line2D.Double(x1, y1, x2, y2));
     }
 
+	public boolean getWallType() {
+		if(Math.abs(x1-x2) > Math.abs(y1-y2)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public Portal getPortalID() {
+		return portal_id;
+	}
+	
 	public double getX1() {
 		return x1;
 	}
@@ -59,20 +74,9 @@ public class Wall {
 	public void setY2(double y2) {
 		this.y2 = y2;
 	}
-    
-	public void createTextureSplices(double x_offset, double y_offset) {
-		for(int i = 0; i < texture.getWidth(); i++) {
-			texture_splices[i] = texture.getSubimage((int)x_offset, (int)y_offset, 1, 1);	
-		}
-	}
-	
-	public BufferedImage[] getTextureSplices() {
-		return texture_splices;
-	}
-	
+
 	public void setTexture(BufferedImage texture) {
 		this.texture = texture;
-		texture_splices = new BufferedImage[Display.manager.walls.size()];
 	}
 	
 	public BufferedImage getTexture() {

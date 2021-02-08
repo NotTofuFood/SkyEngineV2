@@ -37,4 +37,8 @@ public class ExtraMath {
 		}
 	}
 
+	public static double fast_mod(int divis_a, int divis_b) {
+		return (divis_a & (divis_b - 1));
+	}
+	
 }

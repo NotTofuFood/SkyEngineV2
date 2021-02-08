@@ -13,15 +13,19 @@ public class Ray {
 	
 	private double x1, y1, x2, y2;
 	private double degrees;
-	private double FOV;
 	private double distance;
-
+	
+	private boolean isPortal;
+	
 	private int wall_texture_id;
 	
-    public Ray(double x1, double y1, double FOV, double degrees) {
+	private boolean hitHorizontal = false;
+	
+	private Wall wall;
+	
+    public Ray(double x1, double y1, double degrees) {
         this.x1  = x1;
         this.y1 = y1; 
-        this.FOV = FOV;
         this.x2 = this.x1 + Math.cos(degrees) * Integer.MAX_VALUE;
         this.y2 = this.y1 + Math.sin(degrees) * Integer.MAX_VALUE;
         this.degrees = degrees;
@@ -45,10 +49,17 @@ public class Ray {
         if(check != null) {
             x2 = check.getX();
             y2 = check.getY();
+            wall = walls.get(wall_index);
+            hitHorizontal = walls.get(wall_index).getWallType();
             double distance = ExtraMath.distance(x1, y1, check.getX(), check.getY());
+            isPortal = walls.get(wall_index).isPortal;
             wall_texture_id = wall_index;
             setDistance(distance);
         }
+    }
+    
+    public boolean getWallType() {
+    	return hitHorizontal;
     }
     
     private void setDistance(double distance) {
@@ -82,24 +93,19 @@ public class Ray {
 	public void setDegrees(double degrees) {
 		this.degrees = degrees;
 	}
-
-	public double getFOV() {
-		return FOV;
-	}
-
-	public void setFOV(double fOV) {
-		FOV = fOV;
+	
+	public void addDegrees(double degrees) {
+		this.degrees+=degrees;
 	}
 	
 	public double getXOffset(double wall_width) {
 		return x2 % wall_width;
 	}
 	
-	public double getYOffset(double wall_width) {
-		return y2 % wall_width;
+	public double getYOffset(double wall_height) {
+		return y2 % wall_height;
 	}
-	
-	
+
 	public double getX2() {
 		return x2;
 	}
@@ -114,6 +120,14 @@ public class Ray {
 	
 	public int getTextureID() {
 		return wall_texture_id;
+	}
+	
+	public boolean hitPortal() {
+		return isPortal;
+	}
+
+	public Wall getWall() {
+		return wall;
 	}
 	
 }

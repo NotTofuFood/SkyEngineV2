@@ -3,13 +3,13 @@ package main;
 import renderer.Renderer;
 
 public class Gameloop {
-	
-	public boolean isRunning;
-	
+
+	private boolean isRunning;
+
 	public Gameloop(boolean isRunning) {
 		this.isRunning = isRunning;
 	}
-	
+
 	public void loop(Renderer renderer) { 
 		long lastTime = System.nanoTime();
 		double amountOfTicks = 60.0;
@@ -23,13 +23,13 @@ public class Gameloop {
 			lastTime = now;
 			while(delta >= 1) {
 				renderer.update();
+				renderer.repaint();
 				delta--;
 			}
-			renderer.repaint();
 			frames++;
 
 			if(System.currentTimeMillis() - timer > 1000) {
-				System.out.println("FPS: " + frames / 100000);
+				System.out.println("FPS: " + frames/100000);
 				timer += 1000;
 				frames = 0;
 			}

@@ -21,11 +21,11 @@ public class Skybox {
 	}
 	
 	public void render(ImageObserver io, Graphics2D g) {
-		g.drawImage(sprite, x-(int)Window.WIDTH, y, (int)Window.WIDTH, (int)Window.HEIGHT, io);
+		g.drawImage(sprite, x-(int)Window.WIDTH, y, (int)Window.WIDTH, (int)Window.HEIGHT/2, io);
 		
-		g.drawImage(sprite, x, y, (int)Window.WIDTH, (int)Window.HEIGHT, io);
+		g.drawImage(sprite, x, y, (int)Window.WIDTH, (int)Window.HEIGHT/2, io);
 		
-		g.drawImage(sprite, x+(int)Window.WIDTH, y, (int)Window.WIDTH, (int)Window.HEIGHT, io);
+		g.drawImage(sprite, x+(int)Window.WIDTH, y, (int)Window.WIDTH, (int)Window.HEIGHT/2, io);
 	}
 	
 	public void changeSprite(String filename) {

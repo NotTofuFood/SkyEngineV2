@@ -1,5 +1,10 @@
 package rays;
 
+import java.awt.geom.Line2D;
+
+import java.util.List;
+
+import obj.Wall;
 import renderer.Display;
 
 public class Camera  {
@@ -13,6 +18,17 @@ public class Camera  {
 	
 	private float speed = 0.0f;
 	
+	private float hsp = 0.0f;
+	private float vsp = 0.0f;
+	
+	private double sensitivity = 1.5;
+	
+	private double multiplier = 0.8;
+	
+	private boolean stop_up, stop_down;
+	
+	public boolean move_rot = false;
+	
 	public Camera(int x, int y, int WIDTH, int HEIGHT, int FOV) {
 		super();
 		this.x = x;
@@ -22,68 +38,79 @@ public class Camera  {
 	}
 	
 	private void init() {
-		for(int i = 0; i < FOV; i++) {
-			Display.manager.rays.add(new Ray(x, y, FOV, Math.toRadians(i)));
+		for(int i = 0; i < Display.manager.projection_width; i++) {
+			Display.manager.rays.add(new Ray(x, y, Math.toRadians(i*FOV*multiplier/Display.manager.projection_width)));
 		}
+	}
+	
+	public void checkCollisions(List<Wall> walls, int wall_index) {
+		Line2D camera = new Line2D.Double(x,y,x,y-20);
+		Line2D wall = new Line2D.Double(walls.get(wall_index).getX1(),walls.get(wall_index).getY1(),walls.get(wall_index).getX2(), walls.get(wall_index).getY2());
+		
+		if(camera.intersectsLine(wall)) {
+		//	vsp+=speed;
+		} else {
+		//	stop_up = false;
+		}
+		
 	}
 	
 	public void movement(boolean up, boolean down, boolean left, boolean right) { 
-		if(up) {
+		if(up && !stop_up) {
 			moveForward(speed);
 		}
-		if(down) {
-			moveBackward(speed);
+		else if(down && !stop_down) {
+			moveForward(-speed);
+		} else {
+			hsp = 0;
+			vsp = 0;
 		}
 		if(left) {
-			moveRotation(-speed);
+			move_rot = true;
+			moveRotation(-sensitivity);
 		}
 		else if(right) {
-			moveRotation(speed);
+			move_rot = true;
+			moveRotation(sensitivity);
 		} else {
+			move_rot = false;
 			moveRotation(0);
 		}
+
+		if(Math.abs(rotation) > 360) {
+			rotation = 0;
+		}
+		if(rotation < 0) {
+			rotation = 360;
+		}
+		
+		x+=hsp;
+		y+=vsp;
 	}
 	
 	public void update() {
-		for(int i = 0; i < FOV; i++) {
+		for(int i = 0; i < Display.manager.projection_width; i++) {
 			Display.manager.rays.get(i).setX1(x);
 			Display.manager.rays.get(i).setY1(y);
 		}
 	}
 	
-	public void moveForward(float speed) {
+	private void moveForward(float speed) {
 		double rot = 0.0;
-		for(int i = 0; i < FOV; i++) {
-			if(i == FOV/2) {
+		for(int i = 0; i < Display.manager.projection_width; i++) {
+			if(i == Display.manager.projection_width/FOV) {
 				rot = Display.manager.rays.get(i).getDegrees();
 				break;
 			}
 		}
-    	x += Math.cos(rot) * speed;
-    	y += Math.sin(rot) * speed;
-	}
-	public void moveBackward(float speed) {
-		double rot = 0.0;
-		for(int i = 0; i < FOV; i++) {
-			if(i == FOV/2) {
-				rot = Display.manager.rays.get(i).getDegrees();
-				break;
-			}
-		}
-    	x -= Math.cos(rot) * speed;
-    	y -= Math.sin(rot) * speed;
+		hsp = (float) (Math.cos(rot) * speed);
+		vsp = (float) (Math.sin(rot) * speed);
 	}
 	
-	public void moveRotation(double speed) {
+	private void moveRotation(double speed) {
 		rotation+=speed;
-		for(int i = 0; i < FOV; i++) {
-			Display.manager.rays.get(i).setDegrees(Math.toRadians(rotation + i));
-		}
-	}
-	
-	public void resetRotation() {
-		for(int i = 0; i < FOV; i++) {
-			Display.manager.rays.get(i).setDegrees(Math.toRadians(i));
+		for(int i = 0; i < Display.manager.projection_width; i++) {
+			Display.manager.rays.get(i).setDegrees(Math.toRadians(rotation + i*FOV*multiplier/Display.manager.projection_width));
 		}
 	}
 	
@@ -114,7 +141,24 @@ public class Camera  {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	public void setHSP(float speed) {
+		this.hsp = speed;
+	}
+	
+	public void setVSP(float speed) {
+		this.vsp = speed;
+	}
 
+	public float getHSP() {
+		return hsp;
+	}
+	
+	public float getVSP() {
+		return vsp;
+	}
+	
+	
 	public int getFOV() {
 		return FOV;
 	}
@@ -126,5 +170,5 @@ public class Camera  {
 	public void setRotation(float rotation) {
 		this.rotation = rotation;
 	}
-	
+
 }
