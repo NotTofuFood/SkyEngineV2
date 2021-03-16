@@ -10,6 +10,10 @@ public class ExtraMath {
 		return Math.min(Math.max(value, min), max);
 	}
 	
+    public static double lerp(double a, double b, double f) {
+        return a + f * (b - a);
+    }
+	
 	public static Point pointIntersection(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
 		double t1 = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4);
 		double t2 = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);

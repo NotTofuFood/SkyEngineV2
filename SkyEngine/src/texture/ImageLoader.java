@@ -19,7 +19,9 @@ public class ImageLoader {
 	public static List<BufferedImage> wall_textures = new ArrayList<>();
 	
 	public static BufferedImage[][] floor_textures = new BufferedImage[64*64][64*64];
-
+	
+	public static List<BufferedImage> floor_textures_list = new ArrayList<>();
+	
 	private static String last_loaded = "";
 	
 	public static BufferedImage loadImage(String filename) {
@@ -56,7 +58,7 @@ public class ImageLoader {
 		return image_loader;
 	}
 	
-	public static BufferedImage loadFloorImage(String filename) {
+	public static BufferedImage loadFloorImage(String filename, boolean b) {
 		BufferedImage image_loader = null;
 		BufferedImage final_image = null;
 		if(last_loaded != filename) {
@@ -78,10 +80,36 @@ public class ImageLoader {
 		return final_image;
 	}
 	
+	public static BufferedImage loadFloorImage(String filename) {
+		BufferedImage image_loader = null;
+		BufferedImage final_image = null;
+		if(last_loaded != filename) {
+			try {
+				image_loader = ImageIO.read(new File(filename));
+			} catch (IOException e) {
+				try {
+					image_loader = ImageIO.read(new File("res/textures/important/missing_texture.png"));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				e.printStackTrace();
+			}
+		}
+		createFloorTextures((int)Display.manager.wall_width, image_loader);
+		return final_image;
+	}
+	
 	private static void createWallTextures(int wall_width, BufferedImage texture) {
 		for(int ray = 0; ray < Window.WIDTH; ray++) {
 			int wall_offset = (int)ExtraMath.clamp(ray%wall_width, 0, texture.getWidth()-1);
 			wall_textures.add(texture.getSubimage(wall_offset, 0, 1, texture.getHeight()));
+		}
+	}
+	
+	private static void createFloorTextures(int wall_width, BufferedImage texture) {
+		for(int ray = 0; ray < Window.HEIGHT; ray++) {
+			//TODO change wall_width to wall_height if it looks weird
+			floor_textures_list.add(texture.getSubimage(0, ray&wall_width-1, texture.getWidth(), 1));
 		}
 	}
 	

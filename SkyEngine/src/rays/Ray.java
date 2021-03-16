@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.util.List;
 
+import main.Window;
 import maths.Point;
 import maths.ExtraMath;
 import obj.Wall;
@@ -20,6 +21,7 @@ public class Ray {
 	private int wall_texture_id;
 	
 	private boolean hitHorizontal = false;
+	private boolean hit_something = false;
 	
 	private Wall wall;
 	
@@ -47,6 +49,7 @@ public class Ray {
     public void raycast(List<Wall> walls, int wall_index) {
         Point check = ExtraMath.pointIntersection(x1, y1, x2, y2, walls.get(wall_index).getX1(), walls.get(wall_index).getY1(), walls.get(wall_index).getX2(), walls.get(wall_index).getY2());
         if(check != null) {
+        	hit_something = true;
             x2 = check.getX();
             y2 = check.getY();
             wall = walls.get(wall_index);
@@ -55,6 +58,8 @@ public class Ray {
             isPortal = walls.get(wall_index).isPortal;
             wall_texture_id = wall_index;
             setDistance(distance);
+        } else {
+        	hit_something = false;
         }
     }
     
@@ -124,6 +129,10 @@ public class Ray {
 	
 	public boolean hitPortal() {
 		return isPortal;
+	}
+	
+	public boolean hitSomething() {
+		return hit_something;
 	}
 
 	public Wall getWall() {

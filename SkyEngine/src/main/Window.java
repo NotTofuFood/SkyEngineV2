@@ -16,7 +16,7 @@ public class Window {
 	private static Renderer renderer = new Display();
 	
 	public static void main(String[] args) {
-		JFrame window = new JFrame("Sky Engine - Aiden Thakurdial (Version 1.0)");
+		JFrame window = new JFrame("Sky Engine - Aiden Thakurdial (Version 1.3)");
 		Gameloop gameLoop = new Gameloop(true);
 		Input inputs = new Input();
 		window.setSize((int)WIDTH, (int)HEIGHT);

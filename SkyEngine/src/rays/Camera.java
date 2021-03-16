@@ -97,12 +97,7 @@ public class Camera  {
 	
 	private void moveForward(float speed) {
 		double rot = 0.0;
-		for(int i = 0; i < Display.manager.projection_width; i++) {
-			if(i == Display.manager.projection_width/FOV) {
-				rot = Display.manager.rays.get(i).getDegrees();
-				break;
-			}
-		}
+		rot = Display.manager.rays.get(Display.manager.projection_width/FOV).getDegrees();
 		hsp = (float) (Math.cos(rot) * speed);
 		vsp = (float) (Math.sin(rot) * speed);
 	}

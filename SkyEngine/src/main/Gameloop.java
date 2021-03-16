@@ -6,6 +6,8 @@ public class Gameloop {
 
 	private boolean isRunning;
 
+	public static int display_frames = 0;
+	
 	public Gameloop(boolean isRunning) {
 		this.isRunning = isRunning;
 	}
@@ -29,7 +31,7 @@ public class Gameloop {
 			frames++;
 
 			if(System.currentTimeMillis() - timer > 1000) {
-				System.out.println("FPS: " + frames/100000);
+				display_frames = frames/1000000;
 				timer += 1000;
 				frames = 0;
 			}

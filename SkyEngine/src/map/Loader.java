@@ -12,6 +12,7 @@ public class Loader {
 	private String map = null;
 	
 	public void loadMap(String filename) {
+		Display.current_map = filename;
 		File map_file = new File(filename);
 		try {
 			Scanner reader = new Scanner(map_file);

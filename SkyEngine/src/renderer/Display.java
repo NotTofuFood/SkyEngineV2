@@ -1,6 +1,7 @@
 package renderer;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
@@ -20,7 +21,7 @@ public class Display extends Renderer {
 
 	private static final long serialVersionUID = -6740323398587524531L;
 
-	public static SceneManager manager = new SceneManager(9);
+	public static SceneManager manager = new SceneManager(4); //6
 	
 	private Loader map_loader = new Loader();
 	
@@ -37,10 +38,12 @@ public class Display extends Renderer {
 	private Skybox skybox = new Skybox(0,0, "res/skybox/skybox.png");
 	
 	private VolatileImage screen;
+	
+	public static String current_map;
 
 	public Display() {
-		map_loader.loadMap("maps/map_data.lvl");
-		map_loader.createMap();
+		map_loader.loadMap("maps/open.lvl");
+		map_loader.createMap(); 
 		camera = new Camera(400, 400, 1080, 720, FOV);
 		camera.setSpeed(speed);
 		Random r = new Random();
@@ -51,13 +54,15 @@ public class Display extends Renderer {
 			} else if(r.nextInt() >= 5) {
 				manager.walls.get(i).setTexture(ImageLoader.loadImage("res/textures/wolf/wood.png", manager.walls.get(i)));
 			} else {
-				manager.walls.get(i).setTexture(ImageLoader.loadImage("res/glassfacete.png", manager.walls.get(i)));
+				manager.walls.get(i).setTexture(ImageLoader.loadImage("res/textures/wolf/colorstone.png", manager.walls.get(i)));
 			}
 		}
 		manager.image_size = ImageLoader.wall_textures.size();
-		test_portal = new Portal(400, 610, 100, 100, 0, (int) Window.WIDTH, (int) Window.HEIGHT);
+		test_portal = new Portal(870, 610, 100, 100, 0, (int) Window.WIDTH, (int) Window.HEIGHT);
 		manager.createPortal(test_portal, this);
 		
+		//manager.floor_image = ImageLoader.loadFloorImage("res/textures/wolf/wood.png", true);
+		manager.floor_image = ImageLoader.loadFloorImage("res/textures/wolf/redbrick.png", true);
 		repaint();
 	} 
 
@@ -72,9 +77,10 @@ public class Display extends Renderer {
 	}
 
 	public void render(Graphics2D g) {
-		manager.renderFloor(g, this, camera);
+		//manager.renderFloor(g, this, camera);
 		skybox.render(this, g);
 		manager.renderScene3D(g, this, camera);
+		manager.renderInfo(g, camera);
 	}
 	
 	public void paintComponent(Graphics g) {
