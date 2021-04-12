@@ -26,6 +26,6 @@ ADDED/FIXED THINGS FROM VERSION 1:
 
 - Added Dynamic Fog
 
-![alt text](https://github.com/NotTofuFood/SkyEngineV2/blob/main/Capture.PNG?raw=true")
+![alt text](https://github.com/NotTofuFood/SkyEngineV2/blob/main/SampleScene.PNG?raw=true")
 
-The above photo demonstrates floor rendering, sky rendering, textured walls, and most importantly portal rendering.
+The above photo demonstrates floor rendering, ceiling rendering, sky rendering, and multi-textured walls.

@@ -23,7 +23,7 @@ public class Camera  {
 	
 	private double sensitivity = 1.5;
 	
-	private double multiplier = 0.8;
+	public static double multiplier = 0.8;
 	
 	private boolean stop_up, stop_down;
 	

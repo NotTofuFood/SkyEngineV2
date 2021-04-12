@@ -1,7 +1,7 @@
 package renderer;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
@@ -27,7 +27,7 @@ public class Display extends Renderer {
 	
 	private boolean up, down, left, right;
 	
-	private int FOV = 45; //128
+	public static int FOV = 45; //128
 	
 	private float speed = 4;
 	
@@ -35,14 +35,15 @@ public class Display extends Renderer {
 	
 	private Camera camera;
 
-	private Skybox skybox = new Skybox(0,0, "res/skybox/skybox.png");
+	private Skybox skybox;
 	
 	private VolatileImage screen;
 	
 	public static String current_map;
 
 	public Display() {
-		map_loader.loadMap("maps/open.lvl");
+		skybox = new Skybox(0,0, "res/skybox/space.jpg");
+		map_loader.loadMap("maps/test_map.lvl");
 		map_loader.createMap(); 
 		camera = new Camera(400, 400, 1080, 720, FOV);
 		camera.setSpeed(speed);
@@ -62,7 +63,8 @@ public class Display extends Renderer {
 		manager.createPortal(test_portal, this);
 		
 		//manager.floor_image = ImageLoader.loadFloorImage("res/textures/wolf/wood.png", true);
-		manager.floor_image = ImageLoader.loadFloorImage("res/textures/wolf/redbrick.png", true);
+		manager.floor_image = ImageLoader.loadFloorImage("res/glassfacete.png", true);
+		manager.safe_init();
 		repaint();
 	} 
 
@@ -77,9 +79,10 @@ public class Display extends Renderer {
 	}
 
 	public void render(Graphics2D g) {
-		//manager.renderFloor(g, this, camera);
 		skybox.render(this, g);
-		manager.renderScene3D(g, this, camera);
+		manager.renderScene3D(g, this, camera, skybox);
+		//manager.renderScene(g);
+		//manager.renderSceneUnTextured3D(g, camera);
 		manager.renderInfo(g, camera);
 	}
 	
@@ -90,7 +93,7 @@ public class Display extends Renderer {
 		render(screen.createGraphics());
 		g2.drawImage(screen, 0, 0, this);
 		if(camera.move_rot) {
-			for(int i = 0; i < 3; i++) {
+			for(int i = 0; i < 0; i++) {
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)i/10));
 				g2.drawImage(screen, i*(int)manager.wall_width, 0, this);
 			}

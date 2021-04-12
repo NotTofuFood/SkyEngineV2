@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.util.List;
 
-import main.Window;
 import maths.Point;
 import maths.ExtraMath;
 import obj.Wall;
@@ -26,11 +25,11 @@ public class Ray {
 	private Wall wall;
 	
     public Ray(double x1, double y1, double degrees) {
-        this.x1  = x1;
+        this.x1 = x1;
         this.y1 = y1; 
-        this.x2 = this.x1 + Math.cos(degrees) * Integer.MAX_VALUE;
-        this.y2 = this.y1 + Math.sin(degrees) * Integer.MAX_VALUE;
         this.degrees = degrees;
+        this.x2 = this.x1 + Math.cos(this.degrees) * Integer.MAX_VALUE;
+        this.y2 = this.y1 + Math.sin(this.degrees) * Integer.MAX_VALUE;
     }
     
     public void updateRotation() {
