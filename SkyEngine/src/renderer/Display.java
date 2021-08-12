@@ -12,7 +12,6 @@ import main.Window;
 import map.Loader;
 import maths.ThreeValue;
 import rays.Camera;
-import rays.Portal;
 import scene.SceneManager;
 import scene.Skybox;
 import texture.ImageLoader;
@@ -27,11 +26,11 @@ public class Display extends Renderer {
 	
 	private boolean up, down, left, right;
 	
-	public static int FOV = 45; //128
+	public static int FOV = 60; //128
 	
 	private float speed = 4;
 	
-	private Portal test_portal;
+	//private Portal test_portal;
 	
 	private Camera camera;
 
@@ -43,27 +42,29 @@ public class Display extends Renderer {
 
 	public Display() {
 		skybox = new Skybox(0,0, "res/skybox/space.jpg");
-		map_loader.loadMap("maps/test_map.lvl");
+		map_loader.loadMap("maps/map_data2.lvl");
 		map_loader.createMap(); 
-		camera = new Camera(400, 400, 1080, 720, FOV);
+		camera = new Camera(400, 432, FOV);
 		camera.setSpeed(speed);
 		Random r = new Random();
 		manager.fog_settings(new ThreeValue(0, 0, 0), 4);
 		for(int i = 0; i < manager.walls.size(); i++) {
 			if(r.nextInt() >= 7) {
-				manager.walls.get(i).setTexture(ImageLoader.loadImage("res/textures/wolf/eagle.png", manager.walls.get(i)));
+				manager.walls.get(i).setTexture(ImageLoader.loadImage("res/brickwall.png", manager.walls.get(i)));
 			} else if(r.nextInt() >= 5) {
-				manager.walls.get(i).setTexture(ImageLoader.loadImage("res/textures/wolf/wood.png", manager.walls.get(i)));
+				manager.walls.get(i).setTexture(ImageLoader.loadImage("res/demo_tile.png", manager.walls.get(i)));
 			} else {
-				manager.walls.get(i).setTexture(ImageLoader.loadImage("res/textures/wolf/colorstone.png", manager.walls.get(i)));
+				manager.walls.get(i).setTexture(ImageLoader.loadImage("res/planks.png", manager.walls.get(i)));
 			}
 		}
 		manager.image_size = ImageLoader.wall_textures.size();
-		test_portal = new Portal(870, 610, 100, 100, 0, (int) Window.WIDTH, (int) Window.HEIGHT);
-		manager.createPortal(test_portal, this);
 		
-		//manager.floor_image = ImageLoader.loadFloorImage("res/textures/wolf/wood.png", true);
-		manager.floor_image = ImageLoader.loadFloorImage("res/glassfacete.png", true);
+		//test_portal = new Portal(870, 610, 100, 100, 0, (int) Window.WIDTH, (int) Window.HEIGHT);
+		//manager.createPortal(test_portal, this);
+
+		manager.floor_image = ImageLoader.loadFloorTileset("res/half life.png", 16*1, 16*10, 32);
+		manager.ceiling_image = ImageLoader.loadFloorTileset("res/half life.png", 16*10, 16*4, 32);
+
 		manager.safe_init();
 		repaint();
 	} 
@@ -79,11 +80,11 @@ public class Display extends Renderer {
 	}
 
 	public void render(Graphics2D g) {
-		skybox.render(this, g);
+		//skybox.render(this, g);
 		manager.renderScene3D(g, this, camera, skybox);
 		//manager.renderScene(g);
 		//manager.renderSceneUnTextured3D(g, camera);
-		manager.renderInfo(g, camera);
+		//manager.renderInfo(g, camera);
 	}
 	
 	public void paintComponent(Graphics g) {

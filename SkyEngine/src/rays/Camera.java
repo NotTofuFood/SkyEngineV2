@@ -25,11 +25,11 @@ public class Camera  {
 	
 	public static double multiplier = 0.8;
 	
-	private boolean stop_up, stop_down;
+	public boolean stop_up, stop_down;
 	
 	public boolean move_rot = false;
 	
-	public Camera(int x, int y, int WIDTH, int HEIGHT, int FOV) {
+	public Camera(int x, int y, int FOV) {
 		super();
 		this.x = x;
 		this.y = y;
@@ -97,7 +97,7 @@ public class Camera  {
 	
 	private void moveForward(float speed) {
 		double rot = 0.0;
-		rot = Display.manager.rays.get(Display.manager.projection_width/FOV).getDegrees();
+		rot = Display.manager.rays.get(Display.manager.projection_width/2).getDegrees();
 		hsp = (float) (Math.cos(rot) * speed);
 		vsp = (float) (Math.sin(rot) * speed);
 	}

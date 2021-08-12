@@ -1,36 +1,6 @@
 package maths;
 
 public class ExtraMath {
-	
-	private static double[] rotation_cos = new double[400];
-	private static double[] rotation_sin = new double[rotation_cos.length];
-	
-	public static void init() {
-		for(int i = 0; i < rotation_cos.length; i++) {
-			rotation_cos[i] = Math.cos(Math.toRadians(i));
-			rotation_sin[i] = Math.sin(Math.toRadians(i));
-		}
-	}
-	
-	public static double getRotationCos(int deg) {
-		double d;
-		if(deg <= 0) {
-			return -rotation_cos[Math.abs(deg)];
-		} else {
-			d = rotation_cos[deg];
-		}
-		return d;
-	}
-	
-	public static double getRotationSin(int deg) {
-		double d;
-		if(deg <= 0) {
-			return -rotation_sin[Math.abs(deg)];
-		} else {
-			d = rotation_sin[deg];
-		}
-		return d;
-	}
 
 	public static double distance(double x1, double y1, double x2, double y2) {
 		return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));

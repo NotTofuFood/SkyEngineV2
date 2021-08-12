@@ -10,13 +10,13 @@ import renderer.Renderer;
 
 public class Window {
 
-	public static final double WIDTH = java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-	public static final double HEIGHT = java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+	public static final double WIDTH = 1980;
+	public static final double HEIGHT = 1080;
 
 	private static Renderer renderer = new Display();
 	
 	public static void main(String[] args) {
-		JFrame window = new JFrame("Sky Engine - Aiden Thakurdial (Version 1.3)");
+		JFrame window = new JFrame("Sky Engine - Aiden Thakurdial (Version 2.6)");
 		Gameloop gameLoop = new Gameloop(true);
 		Input inputs = new Input();
 		window.setSize((int)WIDTH, (int)HEIGHT);

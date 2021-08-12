@@ -8,6 +8,7 @@ import java.util.List;
 import maths.Point;
 import maths.ExtraMath;
 import obj.Wall;
+import scene.SceneManager;
 
 public class Ray {
 	
@@ -33,8 +34,8 @@ public class Ray {
     }
     
     public void updateRotation() {
-    	x2 += Math.cos(degrees) * Integer.MAX_VALUE;
-    	y2 += Math.sin(degrees) * Integer.MAX_VALUE;
+    	x2 += SceneManager.angles.cos[(int) (Math.abs(Math.toDegrees(degrees)) * 100)] * Integer.MAX_VALUE;
+    	y2 += SceneManager.angles.sin[(int) (Math.abs(Math.toDegrees(degrees)) * 100)] * Integer.MAX_VALUE;
     }
     
     public void render(Graphics2D g, boolean render) {

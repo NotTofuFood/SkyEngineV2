@@ -1,6 +1,5 @@
 package main;
 
-import maths.ExtraMath;
 import renderer.Renderer;
 
 public class Gameloop {
@@ -11,7 +10,6 @@ public class Gameloop {
 	
 	public Gameloop(boolean isRunning) {
 		this.isRunning = isRunning;
-		ExtraMath.init();
 	}
 
 	public void loop(Renderer renderer) { 

@@ -16,8 +16,7 @@ public class Wall {
 	
 	public Portal portal_id;
 	
-	public int textureID = 1;
-	
+
     public Wall(double x1, double y1, double x2, double y2) {
 		super();
 		this.x1 = x1;
@@ -81,10 +80,6 @@ public class Wall {
 	
 	public BufferedImage getTexture() {
 		return texture;
-	}
-	
-	public int getTextureID() {
-		return textureID;
 	}
 	
 }
