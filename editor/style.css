@@ -1,0 +1,69 @@
+html, body {
+    margin: 0 !important; 
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+
+#canvas {
+    position:fixed;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+}
+
+button {
+    border: none;
+    color: rgb(40,40,40);
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    width: 150px;
+    height: 40px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0 0);
+}
+
+h1 {
+    font-size: 20px;
+    font-family: 'Roboto', sans-serif;
+}
+
+h2 {
+    font-size: 15px;
+    font-family: 'Roboto', sans-serif;
+    text-align: left;
+}
+
+.Layout {
+    background-color: rgb(168, 165, 185);
+    background-size: 128px 128px;
+    background-position-x: 10%;
+    background-image: linear-gradient(to right, rgba(128,128,128,.7) 1px, transparent 1px),linear-gradient(to bottom, rgba(128,128,128,.7) 1px, transparent 1px);
+    display: grid; 
+    grid-template-columns: 1fr 1fr 1fr; 
+    grid-template-rows: 0.3fr 1.7fr 1fr; 
+    gap: 0px 0px; 
+    grid-template-areas: 
+      "Tools Tools Tools"
+      "LevelSettings Editor AssetBrowser"
+      "LevelSettings Compiler AssetBrowser"; 
+    width: 100%; 
+    height: 100%; 
+}
+
+.Layout > div {
+    text-align: center;
+    border: 2px solid rgb(40,40,40);
+    font-size: 20px;
+}
+
+.Tools { grid-area: Tools; padding: 2.21%;}
+.LevelSettings { grid-area: LevelSettings; padding: 6.21%;}
+.Compiler { grid-area: Compiler; padding: 20.756%; }
+.AssetBrowser { grid-area: AssetBrowser; padding: 6.21%;}
+.Editor { grid-area: Editor; padding: none; margin:none}
