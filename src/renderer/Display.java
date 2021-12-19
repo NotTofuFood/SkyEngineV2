@@ -44,7 +44,7 @@ public class Display extends Renderer {
 	
 	public Display() {
 		skybox = new Skybox(0,0, "res/skybox/space.jpg");
-		map_loader.loadMap("maps/open.lvl");
+		map_loader.loadMap("maps/test_map.lvl");
 		map_loader.createMap(); 
 		camera = new Camera(400, 432, FOV);
 		camera.setSpeed(speed);
@@ -70,8 +70,9 @@ public class Display extends Renderer {
 			}
 		}
 		
-		for(int light = 0; light < 4; light++) {
-			test_light = new Light(r.nextInt(300),r.nextInt(300), 10, new ThreeValue(r.nextInt(255),r.nextInt(255),r.nextInt(255))); //228,140,242
+		for(int light = 0; light < 5; light++) {
+			test_light = new Light(r.nextInt(800),r.nextInt(800), 100, new ThreeValue(r.nextInt(255),r.nextInt(255),r.nextInt(255))); //228,140,242
+			//manager.lights.add(new Light(r.nextInt(800),r.nextInt(800),100,new ThreeValue(228, 140, 242)));
 			manager.lights.add(test_light);
 		}
 		manager.image_size = ImageLoader.wall_textures.size();

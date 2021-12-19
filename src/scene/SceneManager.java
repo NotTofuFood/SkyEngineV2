@@ -221,7 +221,6 @@ public class SceneManager {
 	        }
 	        return d;
 	    }
-
 	
 	public void renderScene3D(Graphics2D g, ImageObserver io, Camera c, Skybox sky) {
 		BufferedImage texture = null;
@@ -314,46 +313,58 @@ public class SceneManager {
 				int red_color=1;
 				int green_color=1;
 				int blue_color=1;
-				
-				for(int light_index = 1; light_index < lights.size(); light_index++) {
-					int org_red = red_color;
-					int org_green = green_color;
-					int org_blue = blue_color;
+
+				for(int light_index = 0; light_index < lights.size(); light_index++) {
 					float light = (lights.get(light_index).calculateLighting(tx, ty)+1);
-					int red_color1 = (int) (lights.get(light_index).getColor().getX()*(light))+1;
-					int green_color1 = (int) (lights.get(light_index).getColor().getY()*(light))+1;
-					int blue_color1 = (int) (lights.get(light_index).getColor().getZ()*(light))+1;
-					int red_color2 = (int) (lights.get(light_index-1).getColor().getX()*(light))+1;
-					int green_color2 = (int) (lights.get(light_index-1).getColor().getY()*(light))+1;
-					int blue_color2 = (int) (lights.get(light_index-1).getColor().getZ()*(light))+1;
-					//red_color += (int)( org_red + red_color1*.5);
-					//green_color += (int)( org_green + green_color1*.5);
-					//blue_color += (int) ( org_blue + blue_color1*.5);
-					int red_color3=(int) ((red_color1*red_color2)*0.00392156862);
-					int green_color3=(int) ((green_color1*green_color2)*0.00392156862);
-					int blue_color3=(int) ((blue_color1*blue_color2)*0.00392156862);
-					red_color*= red_color3;
-					green_color*= green_color3;
-					blue_color*= blue_color3;
+					
+					int r = (int) (lights.get(light_index).getColor().getX() * light);
+					int gg = (int) (lights.get(light_index).getColor().getY() * light);
+					int b = (int) (lights.get(light_index).getColor().getZ() * light);
+					
+					if(light > 1.0) {
+						red_color+=r;
+						green_color+=gg;
+						blue_color+=b;
+					}
 				}
-				red_color&=255;
-				green_color&=255;
-				blue_color&=255;
-
-
+				
+				//Reflection Effect
+				
+				int red_color_ref = red_color;
+				int green_color_ref = green_color;
+				int blue_color_ref = blue_color;
+				
+				red_color_ref/=lights.size();
+				green_color_ref/=lights.size();
+				blue_color_ref/=lights.size();
+		
+		
+				
+				
+				red_color_ref=(int) ExtraMath.clamp(red_color_ref, 0, 255);
+				green_color_ref=(int) ExtraMath.clamp(green_color_ref, 0, 255);
+				blue_color_ref=(int) ExtraMath.clamp(blue_color_ref, 0, 255);
+				
+		
+				
+				red_color=(int) ExtraMath.clamp(red_color, 0, 255);
+				green_color=(int) ExtraMath.clamp(green_color, 0, 255);
+				blue_color=(int) ExtraMath.clamp(blue_color, 0, 255);
 				
 				int final_color = (red_color << 16) | (green_color << 8) | blue_color;
+				int final_color_ref = (red_color_ref << 16) | (green_color_ref << 8) | blue_color_ref;
+				
+				int final_color_2 = ExtraMath.blend_color(final_color, imagePixelData[tex], 0.3);
+				
+				int final_color_reflection = ExtraMath.blend_color(imagePixelData[tex], final_color_ref, 0.9);
 
-				int final_color_red = (int) imagePixelData[tex]  >> 16 + final_color>>16;
-				int final_color_green = (int) imagePixelData[tex]  >> 8 + final_color>>8;
-			int final_color_blue = (int) imagePixelData[tex] + final_color;
+				floor_buffer_pixels[pixel_index++] = final_color_2>>16;
+				floor_buffer_pixels[pixel_index++] = final_color_2>>8;
+				floor_buffer_pixels[pixel_index++] = final_color_2;
+				floor_buffer_pixels[pixel_index] = 255;
 
-			floor_buffer_pixels[pixel_index++] = final_color>>16;
-        floor_buffer_pixels[pixel_index++] = final_color>>8;
-		floor_buffer_pixels[pixel_index++] = final_color;
-		floor_buffer_pixels[pixel_index] = 255;
-
-		floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);	
+				floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);	
+			//	floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);	
 			}
 
 			for (int i = (int) wall_start+1; i > 0; i--) {
@@ -369,25 +380,57 @@ public class SceneManager {
 				int tex = tex_y*wall_width+tex_x;
 				int pixel_index = (int)ExtraMath.fast_mod((i*projection_width+ray), 1);
 				
-				float light = (lights.get(0).calculateLighting(tx, ty)+1);
+				int red_color=1;
+				int green_color=1;
+				int blue_color=1;
+
+				for(int light_index = 0; light_index < lights.size(); light_index++) {
+					float light = (lights.get(light_index).calculateLighting(tx, ty)+1);
+					
+					int r = (int) (lights.get(light_index).getColor().getX() * light);
+					int gg = (int) (lights.get(light_index).getColor().getY() * light);
+					int b = (int) (lights.get(light_index).getColor().getZ() * light);
+					
+					if(light > 1.0) {
+						red_color+=r;
+						green_color+=gg;
+						blue_color+=b;
+					}
+				}
 				
-				int red_color = (int) (lights.get(0).getColor().getX()*(light));
-				int green_color = (int) (lights.get(0).getColor().getY()*(light));
-				int blue_color = (int) (lights.get(0).getColor().getZ()*(light));
-
-				red_color = (int) ExtraMath.clamp(red_color, 0, 255);
-				green_color = (int) ExtraMath.clamp(green_color, 0, 255);
-				blue_color = (int) ExtraMath.clamp(blue_color, 0, 255);
-
+				//Reflection Effect
+				
+				int red_color_ref = red_color;
+				int green_color_ref = green_color;
+				int blue_color_ref = blue_color;
+				
+				red_color_ref/=lights.size();
+				green_color_ref/=lights.size();
+				blue_color_ref/=lights.size();
+		
+		
+				
+				
+				red_color_ref=(int) ExtraMath.clamp(red_color_ref, 0, 255);
+				green_color_ref=(int) ExtraMath.clamp(green_color_ref, 0, 255);
+				blue_color_ref=(int) ExtraMath.clamp(blue_color_ref, 0, 255);
+				
+		
+				
+				red_color=(int) ExtraMath.clamp(red_color, 0, 255);
+				green_color=(int) ExtraMath.clamp(green_color, 0, 255);
+				blue_color=(int) ExtraMath.clamp(blue_color, 0, 255);
+				
 				int final_color = (red_color << 16) | (green_color << 8) | blue_color;
+				int final_color_ref = (red_color_ref << 16) | (green_color_ref << 8) | blue_color_ref;
+				
+				int final_color_2 = ExtraMath.blend_color(final_color, imagePixelDataCeil[tex], 0.3);
+				
+				int final_color_reflection = ExtraMath.blend_color(imagePixelDataCeil[tex], final_color_ref, 0.9);
 
-				int final_color_red = (int) imagePixelData[tex]  >> 16 + final_color>>16;
-				int final_color_green = (int) imagePixelData[tex]  >> 8 + final_color>>8;
-				int final_color_blue = (int) imagePixelData[tex] + final_color;
-
-				floor_buffer_pixels[pixel_index++] = final_color>>16;
-				floor_buffer_pixels[pixel_index++] = final_color>>8;
-				floor_buffer_pixels[pixel_index++] = final_color;
+				floor_buffer_pixels[pixel_index++] = final_color_2>>16;
+				floor_buffer_pixels[pixel_index++] = final_color_2>>8;
+				floor_buffer_pixels[pixel_index++] = final_color_2;
 				floor_buffer_pixels[pixel_index] = 255;
 
 				floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);	

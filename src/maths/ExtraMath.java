@@ -19,6 +19,26 @@ public class ExtraMath {
     	return x * x * (3 - 2 * x);
     }
     
+	public static int blend_color(int color1, int color2, double ratio) {
+	    ratio = clamp(ratio, 0, 1);
+	    double iRatio = 1.0f - ratio;
+
+	    int r1 = ((color1 & 0xff0000) >> 16);
+	    int g1 = ((color1 & 0xff00) >> 8);
+	    int b1 = (color1 & 0xff);
+
+	    int r2 = ((color2 & 0xff0000) >> 16);
+	    int g2 = ((color2 & 0xff00) >> 8);
+	    int b2 = (color2 & 0xff);
+
+	    int r = (int)((r1 * iRatio) + (r2 * ratio));
+	    int g = (int)((g1 * iRatio) + (g2 * ratio));
+	    int b = (int)((b1 * iRatio) + (b2 * ratio));
+
+	    return ( r << 16 | g << 8 | b );
+	}
+	
+    
     // Based off of Quake III's Fast Inverse Square Root Algorithm
     public static float fstsqrt(float number) {
     	float og = number;
