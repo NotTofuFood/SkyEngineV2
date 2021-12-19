@@ -1,11 +1,12 @@
 package rays;
 
 import java.awt.geom.Line2D;
-
 import java.util.List;
 
+import input.Input;
 import obj.Wall;
 import renderer.Display;
+import scene.SceneManager;
 
 public class Camera  {
 
@@ -55,6 +56,26 @@ public class Camera  {
 		
 	}
 	
+	public void updateMouse(SceneManager manager) {
+		if(Input.MouseLeft() && !Input.MouseRight()) {
+			moveRotation(-sensitivity);
+			move_rot = true;
+		}
+		else if(Input.MouseRight() && !Input.MouseLeft()) {
+			moveRotation(sensitivity);
+			move_rot = true;
+		} else {
+			move_rot = false;
+		}
+		if(Input.MouseUp() && !Input.MouseDown()) {
+			manager.camera_height+=sensitivity;
+		}
+		if(!Input.MouseUp() && Input.MouseDown()) {
+			manager.camera_height-=sensitivity;
+		}
+		Input.resetMouse();
+	}
+	
 	public void movement(boolean up, boolean down, boolean left, boolean right) { 
 		if(up && !stop_up) {
 			moveForward(speed);
@@ -66,15 +87,20 @@ public class Camera  {
 			vsp = 0;
 		}
 		if(left) {
-			move_rot = true;
-			moveRotation(-sensitivity);
+			if(rotation > 180) {
+				hsp = (float) (Math.cos(Math.toRadians(getRotation())) * -speed);
+			} else {
+				vsp = (float) (Math.cos(Math.toRadians(getRotation())) * -speed);
+			}
 		}
 		else if(right) {
-			move_rot = true;
-			moveRotation(sensitivity);
+			if(rotation > 180) {
+				hsp = (float) (Math.cos(Math.toRadians(getRotation())) * speed);
+			} else {
+				vsp = (float) (Math.cos(Math.toRadians(getRotation())) * speed);
+			}
 		} else {
-			move_rot = false;
-			moveRotation(0);
+
 		}
 
 		if(Math.abs(rotation) > 360) {

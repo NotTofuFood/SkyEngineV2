@@ -16,6 +16,7 @@ public class Wall {
 	
 	public Portal portal_id;
 	
+	public boolean has_height = false;
 
     public Wall(double x1, double y1, double x2, double y2) {
 		super();
@@ -80,6 +81,14 @@ public class Wall {
 	
 	public BufferedImage getTexture() {
 		return texture;
+	}
+
+	public boolean isHas_height() {
+		return has_height;
+	}
+
+	public void setHas_height(boolean has_height) {
+		this.has_height = has_height;
 	}
 	
 }

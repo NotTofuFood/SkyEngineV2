@@ -49,12 +49,12 @@ public class Ray {
     public void raycast(List<Wall> walls, int wall_index) {
         Point check = ExtraMath.pointIntersection(x1, y1, x2, y2, walls.get(wall_index).getX1(), walls.get(wall_index).getY1(), walls.get(wall_index).getX2(), walls.get(wall_index).getY2());
         if(check != null) {
-        	hit_something = true;
+        	hit_something = true;        	
             x2 = check.getX();
             y2 = check.getY();
             wall = walls.get(wall_index);
             hitHorizontal = walls.get(wall_index).getWallType();
-            double distance = ExtraMath.distance(x1, y1, check.getX(), check.getY());
+            double distance = ExtraMath.distance(x1, y1, x2, y2);
             isPortal = walls.get(wall_index).isPortal;
             wall_texture_id = wall_index;
             setDistance(distance);
@@ -62,6 +62,67 @@ public class Ray {
         	hit_something = false;
         }
     }
+    
+    public void portalcast(List<Wall> walls, int wall_index, int i) {
+    	// x1 = px
+    	// y1 = py
+    	// x2 = px * cos
+    	// y2 = py * sin
+    	// portal x and portal y are your locations for the wall type, x and y are your destanation points
+    	double px2 = 400;
+    	double py2 = 400;
+    	double px = 400;
+    	double py = 400;
+    	px2 += SceneManager.angles.cos[(int) (Math.abs(Math.toDegrees(degrees)) * 100)] * Integer.MAX_VALUE;
+    	py2 += SceneManager.angles.sin[(int) (Math.abs(Math.toDegrees(degrees)) * 100)] * Integer.MAX_VALUE;
+    	Point check = ExtraMath.pointIntersection(px, py, px2, py2, walls.get(i).getX1(), walls.get(i).getY1(), walls.get(i).getX2(), walls.get(i).getY2());
+    	if(check != null)  {
+    		hit_something = true;
+    		x1 = px;
+    		y1 = py;
+    		x2 = check.getX();
+    		y2 = check.getY();
+    		wall = walls.get(i);
+    		hitHorizontal = walls.get(i).getWallType();
+    		double distance = ExtraMath.distance(x1, y1, x2, y2);
+    		isPortal = walls.get(i).isPortal;
+    		wall_texture_id = i;
+    		setDistance(distance);
+    	}
+    
+    }
+    
+    /*
+     *    
+    public void portalcast(List<Wall> walls, int wall_index) {
+    	// x1 = px
+    	// y1 = py
+    	// x2 = px * cos
+    	// y2 = py * sin
+    	double px2 = walls.get(wall_index).getPortalID().getPortal_x();
+    	double py2 = walls.get(wall_index).getPortalID().getPortal_y();
+    	px2 += SceneManager.angles.cos[(int) (Math.abs(Math.toDegrees(degrees)) * 100)] * Integer.MAX_VALUE;
+    	py2 += SceneManager.angles.sin[(int) (Math.abs(Math.toDegrees(degrees)) * 100)] * Integer.MAX_VALUE;
+    	for(int i = 0; i < walls.size(); i++) {
+    	Point check = ExtraMath.pointIntersection(walls.get(wall_index).getPortalID().getPortal_x(), walls.get(wall_index).getPortalID().getPortal_y(), px2, py2, walls.get(i).getX1(), walls.get(i).getY1(), walls.get(i).getX2(), walls.get(i).getY2());
+    	if(check != null)  {
+    		hit_something = true;
+    		x2 = check.getX();
+    		y2 = check.getY();
+    		x1 = px2;
+    		y1 = py2;
+    		System.out.println(y2);
+    		wall = walls.get(wall_index);
+    		// wall.getPortalID().getPortal_x()
+    		hitHorizontal = walls.get(wall_index).getWallType();
+    		double distance = ExtraMath.distance(x1, y1, x2, y2);
+    		isPortal = walls.get(wall_index).isPortal;
+    		wall_texture_id = wall_index;
+    		setDistance(distance);
+    	}
+    	}
+    }
+     */
     
     public boolean getWallType() {
     	return hitHorizontal;

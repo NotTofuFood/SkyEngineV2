@@ -12,7 +12,7 @@ public class Gameloop {
 		this.isRunning = isRunning;
 	}
 
-	public void loop(Renderer renderer) { 
+	public void loop(Renderer renderer, Renderer gui_renderer) { 
 		long lastTime = System.nanoTime();
 		double amountOfTicks = 60.0;
 		double ns = 1000000000 / amountOfTicks;
@@ -26,6 +26,7 @@ public class Gameloop {
 			while(delta >= 1) {
 				renderer.update();
 				renderer.repaint();
+			
 				delta--;
 			}
 			frames++;

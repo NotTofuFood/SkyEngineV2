@@ -9,6 +9,7 @@ import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
 
+import lighting.Light;
 import main.Gameloop;
 import main.Window;
 import maths.AngleLookup;
@@ -24,6 +25,7 @@ import texture.ImageLoader;
 public class SceneManager {
 
 	public List<Wall> walls = new ArrayList<>();
+	public List<Light> lights = new ArrayList<>();
 	public List<Ray> rays = new ArrayList<>();
 	public List<Portal> portal_rays = new ArrayList<>();
 
@@ -62,6 +64,9 @@ public class SceneManager {
 	private int lowest_x = 0;
 	private int lowest_y = 0;
 	
+	public double camera_height;
+	
+	private boolean reverse = false;
 	
 	public int image_size = 0;
 	
@@ -70,6 +75,8 @@ public class SceneManager {
 	}
 	
 	public void safe_init() {
+		
+		camera_height = Window.HEIGHT/2;
 		
 		imagePixelData = ((DataBufferInt)floor_image.getRaster().getDataBuffer()).getData();
 		
@@ -129,20 +136,36 @@ public class SceneManager {
 			}
 		}
 		
+		for(int light = 0; light < lights.size(); light++) {
+			g.fillOval(lights.get(light).getX(), lights.get(light).getY(), lights.get(light).getRadius(), lights.get(light).getRadius());
+		}
 		
+		int og = 0;
+		
+		if(!reverse) {
 		for(int ray = 0; ray < rays.size(); ray++) {
 			for(int wall = 0; wall < walls.size(); wall++) {
 				walls.get(wall).render(g);
-				rays.get(ray).raycast(walls, wall); 
+				rays.get(ray).raycast(walls, wall);
+				if(rays.get(ray).hitSomething()) {
+				if(rays.get(ray).getWall().isPortal) {
+					reverse = true;
+				}
+				}
 			}
 			rays.get(ray).render(g, true);
 		}
-		for(int portal = 0; portal < portal_rays.size(); portal++) {
-			for(int ray = 0; ray < portal_rays.get(portal).portal_rays.size(); ray++) {
+		} 
+		if(reverse) {
+			for(int ray = 0; ray < rays.size(); ray++) {
 				for(int wall = 0; wall < walls.size(); wall++) {
-					portal_rays.get(portal).portal_rays.get(ray).raycast(walls, wall); 
+					walls.get(wall).render(g);
+					rays.get(ray).portalcast(walls, og, wall);
+					
 				}
-				portal_rays.get(portal).portal_rays.get(ray).render(g, true);
+		
+				rays.get(ray).render(g, true);
+				if(ray >= rays.size()) reverse = false;
 			}
 		}
 	}
@@ -150,7 +173,7 @@ public class SceneManager {
 
 	public void renderSceneUnTextured3D(Graphics2D g, Camera c) {
 		g.setColor(Color.black);
-		g.fillRect(0, (int)Window.HEIGHT/2, (int)Window.WIDTH, (int)Window.HEIGHT/2);
+		g.fillRect(0, (int)camera_height, (int)Window.WIDTH, (int)camera_height);
 		for(int ray = 0; ray < rays.size(); ray++) {
 			for(int wall = 0; wall < walls.size(); wall++) {
 				rays.get(ray).raycast(walls, wall);
@@ -172,99 +195,6 @@ public class SceneManager {
 		walls.get(walls.size()-1).setTexture(ImageLoader.loadImage("res/textures/important/missing_texture.png"));
 	}
 
-	private void renderPortal(Graphics2D g, Portal portal, int ray_index, Camera c, int projected_plane, int recursion, ImageObserver io) {
-		BufferedImage texture = null;
-	
-		for(int wall = 0; wall < walls.size(); wall++) {
-			portal.portal_rays.get(ray_index).raycast(walls, wall);
-			rays.get(ray_index).raycast(walls, wall); 
-		}
-
-		int color = (int) ExtraMath.clamp(portal.portal_rays.get(ray_index).getDistance()/fog_intensity, 0, 255);
-
-		
-		int plus_y = 0;
-		
-		double projected_plane_portal = (int) (wall_height * distToProjectionPlane / portal.portal_rays.get(ray_index).getDistance());
-		
-		if(projected_plane_portal > projected_plane) {
-			projected_plane_portal = projected_plane;
-		}
-		
-		int offset;
-		
-		if(portal.portal_rays.get(ray_index).getWallType()) {
-			offset = (int) ((portal.portal_rays.get(ray_index).getX2())%wall_width);
-		} else {
-			offset = (int) ((portal.portal_rays.get(ray_index).getY2())%wall_width);
-		}
-
-		if(offset >= wall_width) {
-			offset-=wall_width;
-		}
-		if((int)(Window.WIDTH*portal.portal_rays.get(ray_index).getTextureID())+offset < image_size) texture = ImageLoader.wall_textures.get((int)(Window.WIDTH*portal.portal_rays.get(ray_index).getTextureID())+offset);
-
-
-		double wall_end = (Window.HEIGHT/2+(projected_plane_portal*0.5));
-		double wall_start=(Window.HEIGHT/2-(projected_plane_portal*0.5));
-		
-		g.drawImage(texture, ray_index, (int)wall_start+plus_y, 1, (int)(wall_end-wall_start), io);
-
-		g.setColor(new Color(fog_color.getX(),fog_color.getY(),fog_color.getZ(),color));
-		g.fillRect(ray_index*(int)1, (int)wall_start+plus_y, 1, (int)(wall_end-wall_start));
-		
-
-		int tx,ty;
-
-		int ray_rot;
-		ray_rot = (int)(Math.toDegrees(portal.portal_rays.get(ray_index).getDegrees()) * 100);
-
-		for (int i = (int) wall_end+1; i < Window.HEIGHT; i++) {
-
-			double distance = ((float)(wall_height/changer) / (i-Window.HEIGHT/changer) ) * distToProjectionPlane;
-			
-			tx = ( (int) (distance * (angles.cos[Math.abs(ray_rot)]))) + c.getX();
-			ty = ( (int) (distance * (angles.sin[Math.abs(ray_rot)]))) + c.getY();
-			
-			int tex_x = (int)tx&63;
-			int tex_y = (int)ty&63;
-		
-			int tex = tex_y*wall_width+tex_x;
-			int pixel_index = (int)ExtraMath.fast_mod((i*projection_width+ray_index), 1);
-		
-			floor_buffer_pixels[pixel_index] = imagePixelData[tex] >> 16;
-			floor_buffer_pixels[pixel_index+1] = imagePixelData[tex] >> 8;
-			floor_buffer_pixels[pixel_index+2] = imagePixelData[tex];
-		
-			floor_buffer.getRaster().setPixel(ray_index, i, floor_buffer_pixels);	
-		}
-		
-		for (int i = (int) wall_start+plus_y; i > 0; i--) {
-
-			double divsor = i-Window.HEIGHT/changer;
-			
-			double distance = ((float)(wall_height/changer) / (divsor) ) * distToProjectionPlane;
-			
-			tx = ( (int) (-distance * (angles.cos[Math.abs(ray_rot)]))) + c.getX();
-			ty = ( (int) (-distance * (angles.sin[Math.abs(ray_rot)]))) + c.getY();
-			
-			int tex_x = (int)tx&63;
-			int tex_y = (int)ty&63;
-		
-			int tex = tex_y*wall_width+tex_x;
-			int pixel_index = (int)ExtraMath.fast_mod((i*projection_width+ray_index), 1);
-		
-			floor_buffer_pixels[pixel_index] = imagePixelDataCeil[tex] >> 16;
-			floor_buffer_pixels[pixel_index+1] = imagePixelDataCeil[tex] >> 8;
-			floor_buffer_pixels[pixel_index+2] = imagePixelDataCeil[tex];
-		
-			floor_buffer.getRaster().setPixel(ray_index, i, floor_buffer_pixels);	
-		}
-		
-		rays.get(ray_index).render(g, false);
-		portal.portal_rays.get(ray_index).render(g, false);
-	}
-
 	public void fog_settings(ThreeValue color, double intensity) {
 		fog_intensity = intensity;
 		fog_color = color;
@@ -274,7 +204,7 @@ public class SceneManager {
 		g.setColor(Color.WHITE);
 		g.setFont(info_font);
 		g.drawString("FPS: " + Gameloop.display_frames, 10, 50);
-		g.drawString("Global Rotation: " + c.getRotation(), 10, 100);
+		g.drawString("Global Position: " + c.getX() + " , " + c.getY(), 10, 100);
 		g.drawString("Map Name: " + Display.current_map, 10, 150);
 		g.drawString("Walls In Session: " + walls.size(), 10, 200);
 		g.drawString("Columns Being Rendered: " + wall_hit_amount, 10, 250);
@@ -291,117 +221,223 @@ public class SceneManager {
 	        }
 	        return d;
 	    }
-
 	
 	public void renderScene3D(Graphics2D g, ImageObserver io, Camera c, Skybox sky) {
 		BufferedImage texture = null;
 		projected_height_data = new int[rays.size()];
 
 		g.drawImage(floor_buffer, 0, 0, io);
-		
 
 		//sky.render(io, g);
-		
+
 		for(int ray = 0; ray < rays.size(); ray++) {
-			for(int portal = 0; portal < portal_rays.size(); portal++) {
-				portal_rays.get(portal).portal_rays.get(ray).setDegrees(rays.get(ray).getDegrees());
+			for(int wall = 0; wall < walls.size(); wall++) {
+				rays.get(ray).raycast(walls, wall); // if wall is portal wall, do portal cast instead.
+				if(rays.get(ray).hitSomething()) { 
+					wall_hit_amount++;
+				}
+				c.checkCollisions(walls, wall);
 			}
-			if(!rays.get(ray).hitPortal()) {
-				for(int wall = 0; wall < walls.size(); wall++) {
-					rays.get(ray).raycast(walls, wall);
-					if(rays.get(ray).hitSomething()) { 
-						wall_hit_amount++;
-					}
-					c.checkCollisions(walls, wall);
-				}
 
-				int color = (int) ExtraMath.clamp(rays.get(ray).getDistance()/fog_intensity, 0, 255);
+			int color = (int) ExtraMath.clamp(rays.get(ray).getDistance()/fog_intensity, 0, 255);
 
-				double wall_heights = (wall_height * distToProjectionPlane / rays.get(ray).getDistance());
-				double wall_end = (Window.HEIGHT/2+(wall_heights*0.5));
-				double wall_start=(Window.HEIGHT/2-(wall_heights*0.5));
-				
-				int projected_plane =  (int)((Window.HEIGHT/2 + (wall_heights*0.5)) - (Window.HEIGHT/2-(wall_heights*0.5)));
+			double wall_heights = (wall_height * distToProjectionPlane / rays.get(ray).getDistance());
+			double wall_end = (camera_height+(wall_heights*0.5));
+			double wall_start=(camera_height-(wall_heights*0.5));
 
-				if(ray == rays.size()/2) {
-					if(projected_plane > 3000) {
-						c.stop_up = true;
-					} else {
-						c.stop_up = false;
-					}
-				}
+			int projected_plane =  (int)((camera_height + (wall_heights*0.5)) - (camera_height-(wall_heights*0.5)));
 
-				int offset;
-
-				if(rays.get(ray).getWallType()) {
-					offset = (int) ExtraMath.fast_mod((int) (rays.get(ray).getX2()), 64);
+			if(ray == rays.size()/2) {
+				if(projected_plane > 3000) {
+					c.stop_up = true;
 				} else {
-					offset = (int) ExtraMath.fast_mod((int) (rays.get(ray).getY2()), 64);
+					c.stop_up = false;
 				}
+			}
 
-				if(offset >= wall_width) {
-					offset-=wall_width; 
-				}
+			int offset;
 
-				if((int)(Window.WIDTH*rays.get(ray).getTextureID())+offset+16 < image_size) texture = ImageLoader.wall_textures.get((int)(Window.WIDTH*rays.get(ray).getTextureID())+offset+16);
+			if(rays.get(ray).getWallType()) {
+				offset = (int) ExtraMath.fast_mod((int) (rays.get(ray).getX2()), 64);
+			} else {
+				offset = (int) ExtraMath.fast_mod((int) (rays.get(ray).getY2()), 64);
+			}
 
+			if(offset >= wall_width) {
+				offset-=wall_width; 
+			}
+
+			float height_map = 0.f;
+
+			if((int)(Window.WIDTH*rays.get(ray).getTextureID())+offset+16 < image_size) texture = ImageLoader.wall_textures.get((int)(Window.WIDTH*rays.get(ray).getTextureID())+offset+16);
+
+			if(rays.get(ray).getWall().isHas_height()) {
+				if((int)(Window.WIDTH*rays.get(ray).getTextureID())+offset+16 < image_size) height_map = ImageLoader.height_values.get((int)(Window.WIDTH*rays.get(ray).getTextureID())+offset+16)/255.f;
+				height_map*=16.;
 				g.drawImage(texture, ray, (int)wall_start, 1, projected_plane, io);
-			
 				g.setColor(new Color(fog_color.getX(),fog_color.getY(),fog_color.getZ(),color));
 				g.fillRect(ray, (int)wall_start, 1, projected_plane);
-
-				int tx,ty;
-
-				int ray_rot;
-				ray_rot = (int)(Math.toDegrees(rays.get(ray).getDegrees()) * 100);
-
-				for (int i = (int) wall_end+1; i < Window.HEIGHT; i++) {
-					
-					double distance = ((float)(wall_height/changer) / (i-Window.HEIGHT/changer) ) * distToProjectionPlane;
-					
-					tx = ( (int) (distance * (angles.cos[Math.abs(ray_rot)]))) + c.getX();
-					ty = ( (int) (distance * (angles.sin[Math.abs(ray_rot)]))) + c.getY();
-					
-					int tex_x = (int)tx&63;
-					int tex_y = (int)ty&63;
-				
-					int tex = tex_y*wall_width+tex_x;
-					int pixel_index = (int)ExtraMath.fast_mod((i*projection_width+ray), 1);
-				
-					floor_buffer_pixels[pixel_index] = imagePixelData[tex] >> 16;
-					floor_buffer_pixels[pixel_index+1] = imagePixelData[tex] >> 8;
-					floor_buffer_pixels[pixel_index+2] = imagePixelData[tex];
-				
-					floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);	
+				if(!rays.get(ray).getWallType()) {
+					g.drawImage(texture, ray - (int)height_map, (int)wall_start, 1*(int)height_map, projected_plane, io);
+					g.fillRect(ray - (int)height_map, (int)wall_start, 1*(int)height_map, projected_plane);
+				} else {
+					g.drawImage(texture, ray - (int)height_map, (int)wall_start, -1*(int)height_map, projected_plane, io);
+					g.fillRect(ray - (int)height_map, (int)wall_start, -1*(int)height_map, projected_plane);
 				}
-				
-				for (int i = (int) (Window.HEIGHT/changer - projected_plane/changer); i > 0; i--) {
-
-					double divsor = i-Window.HEIGHT/changer;
-					
-					double distance = ((float)(wall_height/changer) / (divsor) ) * distToProjectionPlane;
-					
-					tx = ( (int) (-distance * (angles.cos[Math.abs(ray_rot)]))) + c.getX();
-					ty = ( (int) (-distance * (angles.sin[Math.abs(ray_rot)]))) + c.getY();
-					
-					int tex_x = (int)tx&63;
-					int tex_y = (int)ty&63;
-				
-					int tex = tex_y*wall_width+tex_x;
-					int pixel_index = (int)ExtraMath.fast_mod((i*projection_width+ray), 1);
-				
-					floor_buffer_pixels[pixel_index] = imagePixelDataCeil[tex] >> 16;
-					floor_buffer_pixels[pixel_index+1] = imagePixelDataCeil[tex] >> 8;
-					floor_buffer_pixels[pixel_index+2] = imagePixelDataCeil[tex];
-				
-					floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);	
-				}
-				
-				rays.get(ray).render(g, false);
 			} else {
-				renderPortal(g, rays.get(ray).getWall().getPortalID(), ray, c, (int) (wall_height * distToProjectionPlane / rays.get(ray).getDistance()), 2, io);
-			}			
-		}
+				g.drawImage(texture, ray, (int)wall_start, 1, projected_plane, io);
+			}
+
+
+			g.setColor(new Color(fog_color.getX(),fog_color.getY(),fog_color.getZ(),color));
+			g.fillRect(ray, (int)wall_start, 1, projected_plane);
+
+			int tx,ty;
+
+			int ray_rot;
+			ray_rot = (int)(Math.toDegrees(rays.get(ray).getDegrees()) * 100);
+
+			for (int i = (int) wall_end-1; i < Window.HEIGHT-1; i++) {
+
+				double distance = ((float)(wall_height/changer) / (i-camera_height) ) * distToProjectionPlane;
+
+				tx = ( (int) (distance * (angles.cos[Math.abs(ray_rot)]))) + c.getX();
+				ty = ( (int) (distance * (angles.sin[Math.abs(ray_rot)]))) + c.getY();
+
+				int tex_x = (int)tx&63;
+				int tex_y = (int)ty&63;
+
+				int tex = tex_y*wall_width+tex_x;
+				int pixel_index = (int)ExtraMath.fast_mod((i*projection_width+ray), 1);
+				
+				int red_color=1;
+				int green_color=1;
+				int blue_color=1;
+
+				for(int light_index = 0; light_index < lights.size(); light_index++) {
+					float light = (lights.get(light_index).calculateLighting(tx, ty)+1);
+					
+					int r = (int) (lights.get(light_index).getColor().getX() * light);
+					int gg = (int) (lights.get(light_index).getColor().getY() * light);
+					int b = (int) (lights.get(light_index).getColor().getZ() * light);
+					
+					if(light > 1.0) {
+						red_color+=r;
+						green_color+=gg;
+						blue_color+=b;
+					}
+				}
+				
+				//Reflection Effect
+				
+				int red_color_ref = red_color;
+				int green_color_ref = green_color;
+				int blue_color_ref = blue_color;
+				
+				red_color_ref/=lights.size();
+				green_color_ref/=lights.size();
+				blue_color_ref/=lights.size();
+		
+		
+				
+				
+				red_color_ref=(int) ExtraMath.clamp(red_color_ref, 0, 255);
+				green_color_ref=(int) ExtraMath.clamp(green_color_ref, 0, 255);
+				blue_color_ref=(int) ExtraMath.clamp(blue_color_ref, 0, 255);
+				
+		
+				
+				red_color=(int) ExtraMath.clamp(red_color, 0, 255);
+				green_color=(int) ExtraMath.clamp(green_color, 0, 255);
+				blue_color=(int) ExtraMath.clamp(blue_color, 0, 255);
+				
+				int final_color = (red_color << 16) | (green_color << 8) | blue_color;
+				int final_color_ref = (red_color_ref << 16) | (green_color_ref << 8) | blue_color_ref;
+				
+				int final_color_2 = ExtraMath.blend_color(final_color, imagePixelData[tex], 0.3);
+				
+				int final_color_reflection = ExtraMath.blend_color(imagePixelData[tex], final_color_ref, 0.9);
+
+				floor_buffer_pixels[pixel_index++] = final_color_2>>16;
+				floor_buffer_pixels[pixel_index++] = final_color_2>>8;
+				floor_buffer_pixels[pixel_index++] = final_color_2;
+				floor_buffer_pixels[pixel_index] = 255;
+
+				floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);	
+			//	floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);	
+			}
+
+			for (int i = (int) wall_start+1; i > 0; i--) {
+
+				double distance = ((float)(wall_height/changer) / (i-camera_height) ) * distToProjectionPlane;
+
+				tx = ( (int) (-distance * (angles.cos[Math.abs(ray_rot)]))) + c.getX();
+				ty = ( (int) (-distance * (angles.sin[Math.abs(ray_rot)]))) + c.getY();
+
+				int tex_x = (int)tx&63;
+				int tex_y = (int)ty&63;
+
+				int tex = tex_y*wall_width+tex_x;
+				int pixel_index = (int)ExtraMath.fast_mod((i*projection_width+ray), 1);
+				
+				int red_color=1;
+				int green_color=1;
+				int blue_color=1;
+
+				for(int light_index = 0; light_index < lights.size(); light_index++) {
+					float light = (lights.get(light_index).calculateLighting(tx, ty)+1);
+					
+					int r = (int) (lights.get(light_index).getColor().getX() * light);
+					int gg = (int) (lights.get(light_index).getColor().getY() * light);
+					int b = (int) (lights.get(light_index).getColor().getZ() * light);
+					
+					if(light > 1.0) {
+						red_color+=r;
+						green_color+=gg;
+						blue_color+=b;
+					}
+				}
+				
+				//Reflection Effect
+				
+				int red_color_ref = red_color;
+				int green_color_ref = green_color;
+				int blue_color_ref = blue_color;
+				
+				red_color_ref/=lights.size();
+				green_color_ref/=lights.size();
+				blue_color_ref/=lights.size();
+		
+		
+				
+				
+				red_color_ref=(int) ExtraMath.clamp(red_color_ref, 0, 255);
+				green_color_ref=(int) ExtraMath.clamp(green_color_ref, 0, 255);
+				blue_color_ref=(int) ExtraMath.clamp(blue_color_ref, 0, 255);
+				
+		
+				
+				red_color=(int) ExtraMath.clamp(red_color, 0, 255);
+				green_color=(int) ExtraMath.clamp(green_color, 0, 255);
+				blue_color=(int) ExtraMath.clamp(blue_color, 0, 255);
+				
+				int final_color = (red_color << 16) | (green_color << 8) | blue_color;
+				int final_color_ref = (red_color_ref << 16) | (green_color_ref << 8) | blue_color_ref;
+				
+				int final_color_2 = ExtraMath.blend_color(final_color, imagePixelDataCeil[tex], 0.3);
+				
+				int final_color_reflection = ExtraMath.blend_color(imagePixelDataCeil[tex], final_color_ref, 0.9);
+
+				floor_buffer_pixels[pixel_index++] = final_color_2>>16;
+				floor_buffer_pixels[pixel_index++] = final_color_2>>8;
+				floor_buffer_pixels[pixel_index++] = final_color_2;
+				floor_buffer_pixels[pixel_index] = 255;
+
+				floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);	
+			}
+
+			rays.get(ray).render(g, false);
+		} 	
 
 	}
 }

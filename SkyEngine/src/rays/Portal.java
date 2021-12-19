@@ -15,8 +15,6 @@ public class Portal {
 	
 	private int FOV = 45;
 	
-	private double multiplier = 0.8;
-	
 	private float rotation = 0.0f;
 	
 	private float speed = 0.0f;
@@ -34,17 +32,11 @@ public class Portal {
 	}
 	
 	private void init() {
-		Display.manager.portal_rays.add(this);
-		for(int i = 0; i < Display.manager.projection_width; i++) {
-			portal_rays.add(new Ray(x, y, Math.toRadians(i*FOV*multiplier/Display.manager.projection_width)));
-		}
+
 	}
 	
 	public void moveRotation(double speed) {
-		rotation+=speed;
-		for(int i = 0; i < Display.manager.projection_width; i++) {
-			portal_rays.get(i).setDegrees(Math.toRadians(rotation + i*FOV*multiplier/Display.manager.projection_width));
-		}
+
 	}
 	
 	public double getRotation() {

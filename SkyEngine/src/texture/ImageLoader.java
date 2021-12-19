@@ -1,5 +1,6 @@
 package texture;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -18,6 +19,7 @@ import renderer.Display;
 public class ImageLoader {
 	
 	public static List<BufferedImage> wall_textures = new ArrayList<>();
+	public static List<Integer> height_values = new ArrayList<>();
 
 	private static String last_loaded = "";
 	
@@ -26,11 +28,18 @@ public class ImageLoader {
 		try {
 			image_loader = ImageIO.read(new File(filename));
 		} catch (IOException e) {
-			try {
-				image_loader = ImageIO.read(new File("res/textures/important/missing_texture.png"));
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			BufferedImage missing_texture = new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB);
+			Graphics g = (Graphics) missing_texture.getGraphics();
+			g.setColor(Color.PINK);
+			g.fillRect(0, 0, 16, 16);
+			g.setColor(Color.BLACK);
+			g.fillRect(16, 0, 16, 16);
+			g.setColor(Color.PINK);
+			g.fillRect(0, 16, 16, 16);
+			g.setColor(Color.BLACK);
+			g.fillRect(16, 16, 16, 16);
+			g.dispose();
+			image_loader = missing_texture;
 			e.printStackTrace();
 		}
 		return image_loader;
@@ -42,17 +51,56 @@ public class ImageLoader {
 			try {
 				image_loader = ImageIO.read(new File(filename));
 			} catch (IOException e) {
-				try {
-					image_loader = ImageIO.read(new File("res/textures/important/missing_texture.png"));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				BufferedImage missing_texture = new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB);
+				Graphics g = (Graphics) missing_texture.getGraphics();
+				g.setColor(Color.PINK);
+				g.fillRect(0, 0, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 0, 16, 16);
+				g.setColor(Color.PINK);
+				g.fillRect(0, 16, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 16, 16, 16);
+				g.dispose();
+				image_loader = missing_texture;
 				e.printStackTrace();
 			}
 			createWallTextures((int)Display.manager.wall_width, image_loader);
+			createWallHeightsTextures((int)Display.manager.wall_width, wall, image_loader);
+			wall.setHas_height(false);
 		}
 		return image_loader;
 	}
+	
+	public static BufferedImage loadImage(String filename, String height_filename, Wall wall) {
+		BufferedImage image_loader = null;
+		BufferedImage height_image_loader = null;
+		if(last_loaded != filename) {
+			try {
+				image_loader = ImageIO.read(new File(filename));
+				height_image_loader = ImageIO.read(new File(height_filename));
+			} catch (IOException e) {
+				BufferedImage missing_texture = new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB);
+				Graphics g = (Graphics) missing_texture.getGraphics();
+				g.setColor(Color.PINK);
+				g.fillRect(0, 0, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 0, 16, 16);
+				g.setColor(Color.PINK);
+				g.fillRect(0, 16, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 16, 16, 16);
+				g.dispose();
+				image_loader = missing_texture;
+				height_image_loader = missing_texture;
+				e.printStackTrace();
+			}
+			createWallTextures((int)Display.manager.wall_width, image_loader);
+			createWallHeightsTextures((int)Display.manager.wall_width, wall, height_image_loader);
+		}
+		return image_loader;
+	}
+	
 	
 	private static BufferedImage resizeTexture(BufferedImage texture, int width, int height) {
 		Image tex = texture.getScaledInstance(width, height, Image.SCALE_FAST);
@@ -80,11 +128,18 @@ public class ImageLoader {
 					break;
 				}
 			} catch (IOException e) {
-				try {
-					image_loader = ImageIO.read(new File("res/textures/important/missing_texture.png"));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				BufferedImage missing_texture = new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB);
+				Graphics g = (Graphics) missing_texture.getGraphics();
+				g.setColor(Color.PINK);
+				g.fillRect(0, 0, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 0, 16, 16);
+				g.setColor(Color.PINK);
+				g.fillRect(0, 16, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 16, 16, 16);
+				g.dispose();
+				image_loader = missing_texture;
 				e.printStackTrace();
 			}
 				createWallTextures((int)Display.manager.wall_width, image_loader.getSubimage(row, col, 64, 64));
@@ -104,11 +159,18 @@ public class ImageLoader {
 			    g.drawImage(image_loader, 0, 0, null);
 			    g.dispose();
 			} catch (IOException e) {
-				try {
-					final_image = ImageIO.read(new File("res/textures/important/missing_texture.png"));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				BufferedImage missing_texture = new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB);
+				Graphics g = (Graphics) missing_texture.getGraphics();
+				g.setColor(Color.PINK);
+				g.fillRect(0, 0, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 0, 16, 16);
+				g.setColor(Color.PINK);
+				g.fillRect(0, 16, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 16, 16, 16);
+				g.dispose();
+				final_image = missing_texture;
 				e.printStackTrace();
 			}
 		}
@@ -139,11 +201,18 @@ public class ImageLoader {
 			    g.drawImage(image_loader, 0, 0, null);
 			    g.dispose();
 			} catch (IOException e) {
-				try {
-					final_image = ImageIO.read(new File("res/textures/important/missing_texture.png"));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				BufferedImage missing_texture = new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB);
+				Graphics g = (Graphics) missing_texture.getGraphics();
+				g.setColor(Color.PINK);
+				g.fillRect(0, 0, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 0, 16, 16);
+				g.setColor(Color.PINK);
+				g.fillRect(0, 16, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 16, 16, 16);
+				g.dispose();
+				final_image = missing_texture;
 				e.printStackTrace();
 			}
 		}
@@ -157,5 +226,13 @@ public class ImageLoader {
 		}
 	}
 	
+	private static void createWallHeightsTextures(int wall_width, Wall wall, BufferedImage texture) {
+		for(int ray = 0; ray < Window.WIDTH; ray++) {
+			int wall_offset = (int)ExtraMath.clamp(ray%wall_width, 0, texture.getWidth()-1);
+			int height = (texture.getSubimage(wall_offset, 0, 1, texture.getHeight()).getRGB(0, texture.getHeight()/2)>>16)&0xFF;
+			height_values.add(height);
+			wall.setHas_height(true);
+		}
+	}
 	
 }

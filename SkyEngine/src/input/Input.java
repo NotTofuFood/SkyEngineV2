@@ -1,6 +1,10 @@
 package input;
 
+import java.awt.AWTException;
+import java.awt.MouseInfo;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -8,11 +12,24 @@ import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import main.Window;
 import renderer.Renderer;
 
 public class Input implements MouseListener {
 	
 	public static boolean clicked = false;
+	
+	private static Robot mouse_mover; 
+	
+	private static boolean stopper = false;
+	
+	public Input() {
+		try {
+			mouse_mover = new Robot();
+		} catch (AWTException e1) {
+			e1.printStackTrace();
+		}
+	}
 	
 	public void setDefualts(JPanel panel, Renderer renderer, int key_up, int key_down, int key_left, int key_right) {
 		initInput(panel, key_up, new AbstractAction() {
@@ -61,6 +78,17 @@ public class Input implements MouseListener {
 				renderer.setRight(false);
 			}
 		});
+		initInput(panel, KeyEvent.VK_ESCAPE, new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		}, new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+			public void actionPerformed(ActionEvent e) {
+				stopper = !stopper;
+			}
+		});
 	}
 	
 	private void initInput(JPanel panel, int key, AbstractAction action_pressed, AbstractAction action_released) {
@@ -70,6 +98,60 @@ public class Input implements MouseListener {
 		panel.getActionMap().put("released" + key, action_released);
 	}
 
+	public static boolean MouseUp() {
+		boolean up = false;
+		
+		if(!stopper) {
+		if(MouseInfo.getPointerInfo().getLocation().getY() < Window.HEIGHT/2) {
+			up = true;
+		}
+		}
+		
+		return up;
+	}
+	
+	public static boolean MouseDown() {
+		boolean down = false;
+		
+		if(!stopper) {
+		if(MouseInfo.getPointerInfo().getLocation().getY() > Window.HEIGHT/2) {
+			down = true;
+		}
+		}
+		
+		return down;
+	}
+	
+	public static boolean MouseLeft() {
+		boolean up = false;
+		
+		if(!stopper) {
+		if(MouseInfo.getPointerInfo().getLocation().getX() < Window.WIDTH/2) {
+			up = true;
+		}
+		}
+		
+		return up;
+	}
+	
+	public static boolean MouseRight() {
+		boolean down = false;
+		
+		if(!stopper) {
+		if(MouseInfo.getPointerInfo().getLocation().getX() > Window.WIDTH/2) {
+			down = true;
+		}
+		}
+		
+		return down;
+	}
+	
+	public static void resetMouse() {
+		if(!stopper) {
+			mouse_mover.mouseMove((int)Window.WIDTH/2, (int)Window.HEIGHT/2);
+		} 
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 
