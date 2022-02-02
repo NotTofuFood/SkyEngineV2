@@ -1,37 +1,48 @@
 <!DOCTYPE html>
 <html>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet"> 
-    <head>
-        <title>SkyEngine Version 2.6 Web Editor - SkyBuilder (Aiden Thakurdial)</title>
-        <link rel="stylesheet" href="style.css"> 
-    </head>
-    <body>
-        <div class="Layout">
-            <div class="Tools">
-                <button type="button">Mouse Tool</button>
-                <button type="button">Line Tool</button>
-                <button type="button">Entity Tool</button>
-                <button type="button">Transform Tool</button>
-                <button type="button">Texture Tool</button>
-            </div>
-            <div class="LevelSettings">
-                <h1>Level Settings</h1>
-                <h1 style="font-size: 15px;">Select Skybox:&nbsp&nbsp<input type="file" accept="image/*"/></h1>
-            </div>
-            <div class="Compiler">
-                <h1>Compiler:</h1>
-            </div>
-            <div class="AssetBrowser">
-                <h1>Asset Browser</h1>
-                <button type="button">New Asset</button>
-                <h2>Current Assets:</h2>
-            </div>
-            <div class="Editor" id="Editor">
-                <canvas id="canvas_id">Canvas Not Supported, Please Upgrade Browser</canvas>
-                <script src="index.js"></script>
-            </div>
-          </div>
-    </body>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
+
+  <head>
+    <title>SkyEngine Version 2.6 Web Editor - SkyBuilder (Aiden Thakurdial)</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <div class="Layout">
+      <div class="Tools">
+        <button type="button">Mouse Tool</button>
+        <button type="button">Line Tool</button>
+        <button type="button">Entity Tool</button>
+        <button type="button">Transform Tool</button>
+        <button type="button">Texture Tool</button>
+      </div>
+      <div class="LevelSettings">
+        <h1>Level Settings</h1>
+        <h1 style="font-size: 15px;">Select Skybox:&nbsp&nbsp<input type="file" accept="image/*" /></h1>
+        <h1>Wall Settings</h1>
+        <h2>x: n/a</h2>
+        <h2>y: n/a</h2>
+        <h2 type="text">Z/Height: n/a</h2>
+        <h2>Transparent: n/a</h2>
+        <h2>Image: n/a</h2>
+        <h2>Sector (Will Nullify Above): n/a</h2>
+      </div>
+      <div class="Compiler">
+        <h1>Compiler:</h1>
+      </div>
+      <div class="AssetBrowser">
+        <h1>Asset Browser</h1>
+        <button type="button" id="assetmaker">New Asset</button>
+        <h2>Current Assets:</h2>
+        <h2 id="currassets"></h2>
+      </div>
+      <div class="Editor" id="Editor">
+        <canvas id="canvas_id">Canvas Not Supported, Please Upgrade Browser</canvas>
+        <script src="index.js"></script>
+      </div>
+    </div>
+  </body>
+
 </html>
