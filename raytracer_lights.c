@@ -2,9 +2,13 @@
 
 #include <math.h>
 
+#define MIN_VAL 0.0001
+
+#define WIDTH 320
+#define HEIGHT 200
+
 enum INTERSECTION_CASE {
-  INTERSECTED_ONE,
-  INTERSECTED_TWO,
+  INTERSECTION,
   NO_INTERSECTION
 };
 
@@ -30,6 +34,8 @@ typedef struct Object {
 
 }
 Object;
+
+Vector3 rays[WIDTH][HEIGHT];
 
 float getX(Vector3 vec3) {
   return vec3.x;
@@ -78,6 +84,14 @@ Vector3 vecSubtract(Vector3 v1, Vector3 v2) {
   new_vector.x = v1.x - v2.x;
   new_vector.y = v1.y - v2.y;
   new_vector.z = v1.z - v2.z;
+  return new_vector;
+};
+
+Vector3 vecSubtractScaler(Vector3 v1, float v2) {
+  Vector3 new_vector;
+  new_vector.x = v1.x - v2;
+  new_vector.y = v1.y - v2;
+  new_vector.z = v1.z - v2;
   return new_vector;
 };
 
@@ -150,14 +164,34 @@ float normalizeNumber(float val) {
   return val - 0.0 / 1.0 - 0.0;
 }
 
-enum INTERSECTION_CASE intersect_wall_plane(Vector3 ray, Vector3 plane_pos) {
-  
-  ray = getNormalizedVector(ray);
+enum INTERSECTION_CASE intersect_wall_plane(Vector3 ray, Vector3 ray_r, Vector3 plane_pos, Vector3 plane_r) {
+      //thank you https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection
+    // for the plane intersection function
+    float denom = getDotProduct(plane_r, ray_r);
+    float t;
+    if (denom > MIN_VAL) { 
+        Vector3 com = vecSubtract(plane_pos, ray); 
+        t = getDotProduct(com, plane_r) / denom; 
+        return INTERSECTION; 
+    } 
 
   return NO_INTERSECTION;
 }
 
 int main() {
-
+    
+for (auto row = 0; row < WIDTH; row++) {
+		for (uint16_t col = 0; col < HEIGHT; col++) {
+			float dir_x = (row + 0.5) - WIDTH / 2.;
+			float dir_y = (col + 0.5) - HEIGHT / 2.;
+			float dir_z = -HEIGHT / (2.*tan(FOV*TORADS / 2.));
+			Vector3 ray; 
+			ray.x = dir_X;
+			ray.y = dir_z;
+			
+			rays[row][col] = Vector3(manager.vector3(dir_x, dir_z, dir_y));
+		}
+	}
+	
   return 0;
 }
