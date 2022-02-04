@@ -4,8 +4,11 @@
 
 #define MIN_VAL 0.0001
 
-#define WIDTH 320
-#define HEIGHT 200
+#define WIDTH 256
+#define HEIGHT 192
+#define FOV 75
+
+#define TORADS 0.0174533
 
 enum INTERSECTION_CASE {
   INTERSECTION,
@@ -180,16 +183,35 @@ enum INTERSECTION_CASE intersect_wall_plane(Vector3 ray, Vector3 ray_r, Vector3 
 
 int main() {
     
-for (auto row = 0; row < WIDTH; row++) {
-		for (uint16_t col = 0; col < HEIGHT; col++) {
+for (int row = 0; row < WIDTH; row++) {
+    printf("\n");
+		for (int col = 0; col < HEIGHT; col++) {
 			float dir_x = (row + 0.5) - WIDTH / 2.;
 			float dir_y = (col + 0.5) - HEIGHT / 2.;
 			float dir_z = -HEIGHT / (2.*tan(FOV*TORADS / 2.));
 			Vector3 ray; 
-			ray.x = dir_X;
-			ray.y = dir_z;
+			ray.x = dir_x;
+			ray.y = dir_y;
+			ray.z = dir_z;
 			
-			rays[row][col] = Vector3(manager.vector3(dir_x, dir_z, dir_y));
+			rays[row][col] = ray;
+			
+			Vector3 neutral_rotation;
+			neutral_rotation.x = 0;
+			neutral_rotation.y = 1;
+			neutral_rotation.z = 0;
+			
+			Vector3 object_pos;
+			object_pos.x = 0;
+			object_pos.y = 0;
+			object_pos.z = 0;
+			
+			enum INTERSECTION_CASE d;
+			d = intersect_wall_plane(getNormalizedVector(ray), , getNormalizedVector(object_pos), getNormalizedVector(neutral_rotation));
+			
+			if(d == NO_INTERSECTION) {
+			    printf("0");
+			} else {printf("#");}
 		}
 	}
 	
