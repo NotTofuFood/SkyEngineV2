@@ -14,6 +14,9 @@ public class Skybox {
 	
 	private BufferedImage sprite;
 	
+	public SceneManager manager;
+
+	
 	public Skybox(int x, int y, String filename) {
 		this.x = x;
 		this.y = y;
@@ -21,6 +24,7 @@ public class Skybox {
 	}
 	
 	public void render(ImageObserver io, Graphics2D g) {
+		manager.skyimage = sprite;
 		g.drawImage(sprite, x-(int)Window.WIDTH, y, (int)Window.WIDTH, (int)Window.HEIGHT/2, io);
 		
 		g.drawImage(sprite, x, y, (int)Window.WIDTH, (int)Window.HEIGHT/2, io);

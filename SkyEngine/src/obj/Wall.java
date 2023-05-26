@@ -5,12 +5,13 @@ import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 
+import entities.Entity;
 import rays.Portal;
 
 public class Wall {
 	
 	private double x1, y1, x2, y2;
-	private BufferedImage texture;
+	public BufferedImage texture;
 
 	public boolean isPortal = false;
 	
@@ -18,6 +19,12 @@ public class Wall {
 	
 	public boolean has_height = false;
 
+	public boolean isEntity = false;
+	
+	public String NAME_ONLY_APPLICABLE_WHEN_DEFINED_OTHERWISE_EXPECT_NULLPOINTER;
+	
+	public Entity entity;
+	
     public Wall(double x1, double y1, double x2, double y2) {
 		super();
 		this.x1 = x1;

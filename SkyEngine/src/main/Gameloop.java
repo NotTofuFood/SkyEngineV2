@@ -26,7 +26,7 @@ public class Gameloop {
 			while(delta >= 1) {
 				renderer.update();
 				renderer.repaint();
-			
+				
 				delta--;
 			}
 			frames++;

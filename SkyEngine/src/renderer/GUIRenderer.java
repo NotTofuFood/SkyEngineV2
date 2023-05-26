@@ -14,8 +14,7 @@ public class GUIRenderer extends Renderer {
 
 	@Override
 	public void render(Graphics2D g) {
-		// TODO Auto-generated method stub
-		
+		//g.setColor(c);
 	}
 
 	@Override

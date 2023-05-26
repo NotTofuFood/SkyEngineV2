@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import entities.Entity;
 import main.Window;
 import maths.ExtraMath;
 import obj.Wall;
@@ -66,8 +67,34 @@ public class ImageLoader {
 				e.printStackTrace();
 			}
 			createWallTextures((int)Display.manager.wall_width, image_loader);
-			createWallHeightsTextures((int)Display.manager.wall_width, wall, image_loader);
+		//	createWallHeightsTextures((int)Display.manager.wall_width, wall, image_loader);
 			wall.setHas_height(false);
+		}
+		return image_loader;
+	}
+	
+	
+	public static BufferedImage loadEntityImage(String filename, Entity entity_obj) {
+		BufferedImage image_loader = null;
+		if(last_loaded != filename) {
+			try {
+				image_loader = ImageIO.read(new File(filename));
+			} catch (IOException e) {
+				BufferedImage missing_texture = new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB);
+				Graphics g = (Graphics) missing_texture.getGraphics();
+				g.setColor(Color.PINK);
+				g.fillRect(0, 0, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 0, 16, 16);
+				g.setColor(Color.PINK);
+				g.fillRect(0, 16, 16, 16);
+				g.setColor(Color.BLACK);
+				g.fillRect(16, 16, 16, 16);
+				g.dispose();
+				image_loader = missing_texture;
+				e.printStackTrace();
+			}
+			createEntityTextures(Display.manager.wall_width, image_loader, entity_obj);
 		}
 		return image_loader;
 	}
@@ -223,6 +250,13 @@ public class ImageLoader {
 		for(int ray = 0; ray < Window.WIDTH; ray++) {
 			int wall_offset = (int)ExtraMath.clamp(ray%wall_width, 0, texture.getWidth()-1);
 			wall_textures.add(texture.getSubimage(wall_offset, 0, 1, texture.getHeight()));
+		}
+	}
+	
+	private static void createEntityTextures(int wall_width, BufferedImage texture, Entity entity) {
+		for(int ray = 0; ray < Window.WIDTH; ray++) {
+			int wall_offset = (int)ExtraMath.clamp(ray%wall_width, 0, texture.getWidth()-1);
+			entity.sprites.add(texture.getSubimage(wall_offset, 0, 1, texture.getHeight()));
 		}
 	}
 	

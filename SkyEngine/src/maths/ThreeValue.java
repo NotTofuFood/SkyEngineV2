@@ -2,22 +2,24 @@ package maths;
 
 public class ThreeValue {
 	
-	private int x;
-	private int y;
-	private int z;
-	public ThreeValue(int x, int y, int z) {
-		super();
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	private double x;
+	private double y;
+	private double z;
+	
+	public ThreeValue(double f, double g, double h) {
+		this.x = f;
+		this.y = g;
+		this.z = h;
 	}
-	public int getX() {
+
+	public double getX() {
 		return x;
 	}
-	public int getY() {
+	public double getY() {
 		return y;
 	}
-	public int getZ() {
+	public double getZ() {
 		return z;
 	}	
+	
 }

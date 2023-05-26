@@ -4,6 +4,7 @@ import java.awt.geom.Line2D;
 import java.util.List;
 
 import input.Input;
+import main.Window;
 import obj.Wall;
 import renderer.Display;
 import scene.SceneManager;
@@ -22,13 +23,19 @@ public class Camera  {
 	private float hsp = 0.0f;
 	private float vsp = 0.0f;
 	
-	private double sensitivity = 1.5;
+	public double sensitivity = 1.5;
 	
 	public static double multiplier = 0.8;
 	
 	public boolean stop_up, stop_down;
 	
 	public boolean move_rot = false;
+	
+	private int headbob = 0;
+	
+	public double[] headbobs = new double[360];
+	
+	public int current_head = 0;
 	
 	public Camera(int x, int y, int FOV) {
 		super();
@@ -41,7 +48,15 @@ public class Camera  {
 	private void init() {
 		for(int i = 0; i < Display.manager.projection_width; i++) {
 			Display.manager.rays.add(new Ray(x, y, Math.toRadians(i*FOV*multiplier/Display.manager.projection_width)));
+			Display.manager.rays.get(i).index = i;
 		}
+		
+		for(int i = 0; i < 360; i++) {
+			headbob = (headbob+(int)4)%360;
+
+			headbobs[i] = Math.sin(Math.toRadians(headbob))*0.3;
+		}
+		
 	}
 	
 	public void checkCollisions(List<Wall> walls, int wall_index) {
@@ -67,13 +82,26 @@ public class Camera  {
 		} else {
 			move_rot = false;
 		}
-		if(Input.MouseUp() && !Input.MouseDown()) {
+	/*	if(Input.MouseUp() && !Input.MouseDown()) {
 			manager.camera_height+=sensitivity;
 		}
 		if(!Input.MouseUp() && Input.MouseDown()) {
 			manager.camera_height-=sensitivity;
+		}*/
+		
+		if(hsp != 0) {
+			current_head++;
+			current_head%=360;
+			manager.camera_height+=headbobs[current_head];
+		} else {
+			manager.camera_height = Window.HEIGHT/2;
 		}
+		
 		Input.resetMouse();
+	}
+	
+	public boolean getRotationMovement() {
+		return move_rot;
 	}
 	
 	public void movement(boolean up, boolean down, boolean left, boolean right) { 
@@ -85,22 +113,6 @@ public class Camera  {
 		} else {
 			hsp = 0;
 			vsp = 0;
-		}
-		if(left) {
-			if(rotation > 180) {
-				hsp = (float) (Math.cos(Math.toRadians(getRotation())) * -speed);
-			} else {
-				vsp = (float) (Math.cos(Math.toRadians(getRotation())) * -speed);
-			}
-		}
-		else if(right) {
-			if(rotation > 180) {
-				hsp = (float) (Math.cos(Math.toRadians(getRotation())) * speed);
-			} else {
-				vsp = (float) (Math.cos(Math.toRadians(getRotation())) * speed);
-			}
-		} else {
-
 		}
 
 		if(Math.abs(rotation) > 360) {

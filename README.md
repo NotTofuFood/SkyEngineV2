@@ -1,18 +1,17 @@
-# SkyEngine Version 2.6
+# SkyEngine Version 2.4
 (Please do not use this as an actual engine yet and expecting it to be done, it is heavily in development)
 
 
-Whats new? - ADDED/FIXED THINGS FROM VERSION 2.3:
+Whats new? - ADDED/FIXED THINGS FROM VERSION 2.4:
 
-- Optimization
+- Entities + Sprites
 
-- Fixed Floors and Ceilings
+- Audio
 
-- Added Forward Collisions
+- Revamped Fog
 
-- Added Tileset Support For All Texture Settings
+- GUI Class
 
-- Fixed Projection Issues
 
 ![alt text](https://github.com/NotTofuFood/SkyEngineV2/blob/main/SampleScene.PNG?raw=true")
 
@@ -23,14 +22,13 @@ The above photo demonstrates floor rendering, ceiling rendering, diagonal walls,
 - Full realtime audio that takes in account the sceneray, in order to give off a realistic audio playback
 - "2D Raytracing" to make a lightmap for the scene, giving off very nice lighting from the walls
 - Doors
-- Entities
 - "Triggers" that can be used in the editor in order to trigger certain events, or check for certain events
 - Revamping the current editor for making maps and porting the editor over to JavaScript.
-- Fixed collisions and hopefully all of the bugs listed below
 
 # KNOWN BUGS
 
-- Only Forward Collisions
+- Wonky Collisions
+- Entities sometimes flicker
 - Coordinate out of bounds error thrown by SceneManager.Java (has no effect on gameplay and is thrown by the floor for loop)
 - Camera moves weirdly when trying to go forward/backward sometimes (Slightly Fixed)
 - Images won't export in the .jar file
@@ -62,3 +60,9 @@ The above photo demonstrates floor rendering, ceiling rendering, diagonal walls,
 - Added Ceiling
 
 - Added Dynamic Fog
+
+- Added Forward Collisions
+
+- Added Tileset Support For All Texture Settings
+
+- Fixed Projection Issues

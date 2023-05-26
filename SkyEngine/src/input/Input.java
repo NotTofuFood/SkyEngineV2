@@ -1,9 +1,11 @@
 package input;
 
 import java.awt.AWTException;
+import java.awt.Frame;
 import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -23,6 +25,8 @@ public class Input implements MouseListener {
 	
 	private static boolean stopper = false;
 	
+	private static boolean reload = false;
+	
 	public Input() {
 		try {
 			mouse_mover = new Robot();
@@ -32,6 +36,7 @@ public class Input implements MouseListener {
 	}
 	
 	public void setDefualts(JPanel panel, Renderer renderer, int key_up, int key_down, int key_left, int key_right) {
+		
 		initInput(panel, key_up, new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent e) {
@@ -89,6 +94,28 @@ public class Input implements MouseListener {
 				stopper = !stopper;
 			}
 		});
+		
+		
+	}
+	
+	public void addReloadInput(JPanel panel) {
+		initInput(panel, KeyEvent.VK_R, new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e) {
+				reload = true;
+			}
+			
+		},new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e) {
+				reload = false;
+			}
+			
+		});
 	}
 	
 	private void initInput(JPanel panel, int key, AbstractAction action_pressed, AbstractAction action_released) {
@@ -97,12 +124,13 @@ public class Input implements MouseListener {
 		panel.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, 0, true), "released" + key);
 		panel.getActionMap().put("released" + key, action_released);
 	}
+	
 
 	public static boolean MouseUp() {
 		boolean up = false;
 		
 		if(!stopper) {
-		if(MouseInfo.getPointerInfo().getLocation().getY() < Window.HEIGHT/2) {
+		if(MouseInfo.getPointerInfo().getLocation().getY() < Window.HEIGHT) {
 			up = true;
 		}
 		}
@@ -114,7 +142,7 @@ public class Input implements MouseListener {
 		boolean down = false;
 		
 		if(!stopper) {
-		if(MouseInfo.getPointerInfo().getLocation().getY() > Window.HEIGHT/2) {
+		if(MouseInfo.getPointerInfo().getLocation().getY() > Window.HEIGHT) {
 			down = true;
 		}
 		}
@@ -124,9 +152,9 @@ public class Input implements MouseListener {
 	
 	public static boolean MouseLeft() {
 		boolean up = false;
-		
+
 		if(!stopper) {
-		if(MouseInfo.getPointerInfo().getLocation().getX() < Window.WIDTH/2) {
+		if(MouseInfo.getPointerInfo().getLocation().getX() < Window.WIDTH) {
 			up = true;
 		}
 		}
@@ -138,7 +166,7 @@ public class Input implements MouseListener {
 		boolean down = false;
 		
 		if(!stopper) {
-		if(MouseInfo.getPointerInfo().getLocation().getX() > Window.WIDTH/2) {
+		if(MouseInfo.getPointerInfo().getLocation().getX() > Window.WIDTH) {
 			down = true;
 		}
 		}
@@ -148,11 +176,14 @@ public class Input implements MouseListener {
 	
 	public static void resetMouse() {
 		if(!stopper) {
-			mouse_mover.mouseMove((int)Window.WIDTH/2, (int)Window.HEIGHT/2);
+			mouse_mover.mouseMove((int)Window.WIDTH, (int)Window.HEIGHT);
 		} 
 	}
 	
-	@Override
+	public static boolean getReload() {
+		return reload;
+	}
+	
 	public void mouseClicked(MouseEvent e) {
 
 	}
