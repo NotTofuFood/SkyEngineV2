@@ -11,6 +11,7 @@ import maths.ExtraMath;
 import maths.Point;
 import obj.ModelLoader;
 import obj.Wall;
+import renderer.Display;
 import scene.SceneManager;
 
 public class Ray {
@@ -106,7 +107,7 @@ public class Ray {
          	entity_distance = ExtraMath.distance(x1, y1, entity.x, entity.y);
          	entity.onScreen = true;
        
-         	if(entity_distance < 400) {
+         	if(entity_distance < Display.RenderDistanceEnt) {
          //	System.out.println("SPR: " + entity.sprite + " Dist: " + entity_distance + " Index: " + index + " Entity Frame: " + entity.clearFrame);
          	entity.rindex = index; 
          	entity.distance = entity_distance;
@@ -117,7 +118,7 @@ public class Ray {
          		castingEntity = false;
          	}
       		}
-         } 
+         }
     }
     
  

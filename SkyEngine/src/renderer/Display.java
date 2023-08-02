@@ -3,6 +3,7 @@ package renderer;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.VolatileImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,7 @@ public class Display extends Renderer {
 	
 	public List<CustomParameter> gun = new ArrayList<>();
 	
-	public NPC test_npc = new NPC(200, 200, 64, 128, 5);
+	public NPC test_npc = new NPC(200, 200, 16, 16, 5, 100, "res/hecu_beret.png", "res/hecu_dead.png");
 	
 	public List<Entity> entites = new ArrayList<>();
 	
@@ -74,6 +75,8 @@ public class Display extends Renderer {
 	public TimerTask fire_test;
 	
 	public boolean canFire = true;
+	
+	public static int RenderDistanceEnt = 600;
 	
 	public Display() {
 		
@@ -135,22 +138,21 @@ public class Display extends Renderer {
 		//ImageLoader.loadEntityImage(box.sprite, box);
 		entites.add(box);
 		
-		for(int i = 0; i < 20; i++) {
-			int x = (int) Math.round(r.nextInt(900));
-			int y = (int) Math.round(r.nextInt(900));
+		for(int i = 0; i < 40; i++) {
+			int x = (int) Math.round(r.nextInt(1900));
+			int y = (int) Math.round(r.nextInt(1900));
 			
 			Random re = new Random();
 			StaticEntity box;
 			if(re.nextInt(20) > 15) {
-				 box = new StaticEntity("res/hecu.png", x, y, 4, 4);
-			} else {
-				 box = new StaticEntity("res/textures/wolf/barrel.png", x, y, 4, 4);
-			}
+				box = new StaticEntity("res/textures/wolf/barrel.png", x, y, 32, 32);
 			entites.add(box);
+			
+			}
 		}
-		
 		gun.set(0, idle);
-		
+		entites.add(test_npc);
+		test_npc.canMove = true;
 		repaint();
 	} 
 	
@@ -163,6 +165,7 @@ public class Display extends Renderer {
 		camera.movement(isUp(), isDown(), isLeft(), isRight());
 		camera.updateMouse(manager);
 		camera.update();
+		test_npc.update(new Rectangle2D.Double(camera.getX(), camera.getY(), 4, 4), manager.walls);
 		manager.sortEnts(entites, camera, new double[entites.size()-1]);
 		if(camera.getRotationMovement() && Input.MouseLeft() && !Input.MouseRight()) {
 			skybox.move(-speed);

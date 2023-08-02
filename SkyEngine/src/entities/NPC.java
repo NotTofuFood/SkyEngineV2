@@ -10,6 +10,7 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import input.Input;
 import maths.ExtraMath;
 import obj.Wall;
 import rays.Ray;
@@ -19,19 +20,25 @@ public class NPC extends Entity {
 	
 	//For random movement only
 	public Random r;
+	public int HP = 100;
 	
-	public NPC(int x, int y, int bbx, int bby, int sp) {
+	public String zero_hp_sprite;
+	
+	public NPC(int x, int y, int bbx, int bby, int sp, int hp, String sprite, String zero_hp_sprite) {
+		//Leave zero_hp_sprite as null if needed
 		start();
 		this.x = x;
+		this.HP = hp;
 		this.y = y;
 		this.sp = sp;
 		this.BoundingBoxSizeX=bbx;
 		this.BoundingBoxSizeY=bby;
-		this.worldspace = new Wall(this.x, this.y, this.x+bbx, this.y+bby);
+		//this.worldspace = new Wall(this.x, this.y, this.x+bbx, this.y+bby);
 		BoundingBox = new Rectangle2D.Float(x,y,bbx,bby);
-		sprite = "res/Aiden.png";
+		this.sprite = sprite;
+		this.zero_hp_sprite = zero_hp_sprite;
 		r = new Random();
-		this.worldspace.isEntity = true;
+	//	this.worldspace.isEntity = true;
 	}
 	
 	public void start() {
@@ -46,26 +53,24 @@ public class NPC extends Entity {
 	}
 	
 	public void update(Rectangle2D other, List<Wall> wall_data) {
-		
-		move();
-		if(other != null) {
-			checkCollisions(other);
+		if(HP > 0) {
+			move();
+			if(other != null) {
+				checkCollisions(other);
+			}
+			x+=hsp;
+			y+=vsp;
+		} else {
+			sprite = zero_hp_sprite;
 		}
-		x+=hsp;
-		y+=vsp;
-		
-		wall_data.get(world_index).setX1(this.x);
-		wall_data.get(world_index).setY1(this.y);
-		wall_data.get(world_index).setX2(this.x + BoundingBox.getWidth());
-		wall_data.get(world_index).setY2(this.y + BoundingBox.getHeight());
 	}
 
 	public void move() {
 		if(canMove) {
 			//Random Movement Test
-			if(r.nextInt(30) == 3) {
+			if(r.nextInt(20) == 3) {
 				hsp = ExtraMath.choose(1, 0, -1, r) * sp;
-			} else if(r.nextInt(30) == 7) {
+			} else if(r.nextInt(20) == 7) {
 				vsp = ExtraMath.choose(1, 0, -1, r) * sp;
 			} else {
 				hsp = 0;
@@ -84,9 +89,7 @@ public class NPC extends Entity {
 	}
 
 	public void addEntityToWallData(List<Wall> wall_data) {
-		world_index = wall_data.size()-1;
-		wall_data.get(world_index).isEntity = true;
-		wall_data.get(world_index).entity = this;
+	
 	}
 
 

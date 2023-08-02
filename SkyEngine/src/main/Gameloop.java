@@ -11,32 +11,34 @@ public class Gameloop {
 	public Gameloop(boolean isRunning) {
 		this.isRunning = isRunning;
 	}
-
+	//renderer.update();
+//	renderer.repaint();
+//add entity chunking
 	public void loop(Renderer renderer, Renderer gui_renderer) { 
-		long lastTime = System.nanoTime();
-		double amountOfTicks = 60.0;
-		double ns = 1000000000 / amountOfTicks;
-		double delta = 0;
-		long timer = System.currentTimeMillis();
-		int frames = 0;
+		
+		double startTime = System.currentTimeMillis();
+		
+		int Target_FPS = 20;
+		
+		double ticks = 0;
+		
 		while(isRunning) {
-			long now = System.nanoTime();
-			delta += (now - lastTime) / ns;
-			lastTime = now;
-			while(delta >= 1) {
-				renderer.update();
-				renderer.repaint();
+			
+			double currentTime = System.currentTimeMillis();
+			double deltaTime = currentTime-startTime;
+		
+			ticks+=deltaTime;
+			
+		
+			if(ticks >= Target_FPS) {
 				
-				delta--;
+				renderer.update();
+				
+				ticks-=Target_FPS;
 			}
-			frames++;
-
-			if(System.currentTimeMillis() - timer > 1000) {
-				display_frames = frames/1000000;
-				timer += 1000;
-				frames = 0;
-			}
+			startTime = currentTime;
+			renderer.repaint();
 		}
-		isRunning = false;
+		
 	}
 }

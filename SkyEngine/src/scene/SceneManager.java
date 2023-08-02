@@ -16,6 +16,8 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import entities.Entity;
+import entities.NPC;
+import input.Input;
 import lighting.Light;
 import main.Gameloop;
 import main.Window;
@@ -550,9 +552,9 @@ public class SceneManager {
 
 				int final_color_reflection = ExtraMath.blend_color(imagePixelData[tex], final_color_ref, 0.9);
 
-				floor_buffer_pixels[pixel_index++] = final_color_2 >> 16;
-				floor_buffer_pixels[pixel_index++] = final_color_2 >> 8;
-				floor_buffer_pixels[pixel_index++] = final_color_2;
+				floor_buffer_pixels[pixel_index++] = imagePixelDataCeil[tex] >> 16;
+				floor_buffer_pixels[pixel_index++] = imagePixelDataCeil[tex] >> 8;
+				floor_buffer_pixels[pixel_index++] = imagePixelDataCeil[tex];
 				floor_buffer_pixels[pixel_index] = 255;
 
 				floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);
@@ -621,9 +623,9 @@ public class SceneManager {
 
 					int final_color_reflection = ExtraMath.blend_color(imagePixelDataCeil[tex], final_color_ref, 0.9);
 
-					floor_buffer_pixels[pixel_index++] = final_color_2 >> 16;
-					floor_buffer_pixels[pixel_index++] = final_color_2 >> 8;
-					floor_buffer_pixels[pixel_index++] = final_color_2;
+					floor_buffer_pixels[pixel_index++] = imagePixelDataCeil[tex] >> 16;
+					floor_buffer_pixels[pixel_index++] = imagePixelDataCeil[tex] >> 8;
+					floor_buffer_pixels[pixel_index++] = imagePixelDataCeil[tex];
 					floor_buffer_pixels[pixel_index] = 255;
 
 					floor_buffer.getRaster().setPixel(ray, i, floor_buffer_pixels);
@@ -685,7 +687,14 @@ public class SceneManager {
 		
 		for(int entity = 0; entity < entities.size(); entity++) {
 			if(entities.get(entity).onScreen && entities.get(entity).rindex > 0) {
-		
+				
+				
+				if(Input.clicked) {
+					if(entities.get(entity) instanceof NPC) {
+						NPC npc = (NPC)entities.get(entity);
+						npc.HP-=10;
+					}
+				}
 		int sps = wall_width; //proportil reasoning from 512/64
 		
 		//double prop = wall_width/sps;
@@ -703,14 +712,6 @@ public class SceneManager {
 		BufferedImage img = null;
 		try {
 			spr = ImageIO.read(new File(entities.get(entity).sprite));
-			img = new BufferedImage(spr.getWidth(), spr.getHeight(), BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g2 = img.createGraphics();
-			g2.setXORMode(new Color(255,255,255));
-			g2.setComposite(AlphaComposite.SrcOver.derive((float)entities.get(entity).distance/1000));
-			g2.setColor(Color.BLACK);
-			//g2.drawImage(spr, 0,  (int) ((entity_end)-final_dis/size_changer), spr.getWidth(), spr.getHeight(), io);
-			g2.fillRect(0, (int) ((entity_end)-final_dis/size_changer), spr.getWidth(), spr.getHeight());
-			g2.dispose();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
